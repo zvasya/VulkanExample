@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ios", "ios\ios.csproj", "{F33E8DEA-B39F-46D8-83AE-1DB4793B0DA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "android", "android\android.csproj", "{EDAB4D2B-D0E0-4108-AB08-2A054DB0C4CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F33E8DEA-B39F-46D8-83AE-1DB4793B0DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F33E8DEA-B39F-46D8-83AE-1DB4793B0DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F33E8DEA-B39F-46D8-83AE-1DB4793B0DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDAB4D2B-D0E0-4108-AB08-2A054DB0C4CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDAB4D2B-D0E0-4108-AB08-2A054DB0C4CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDAB4D2B-D0E0-4108-AB08-2A054DB0C4CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDAB4D2B-D0E0-4108-AB08-2A054DB0C4CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
