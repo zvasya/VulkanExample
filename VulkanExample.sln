@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mac_catalyst", "mac_catalys
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mac", "mac\mac.csproj", "{6D2E6211-3732-40C0-867B-5E7A50A0D6FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "maui", "maui\maui.csproj", "{642B1874-B1C2-43A3-9D6A-7053C325F39F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{6D2E6211-3732-40C0-867B-5E7A50A0D6FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D2E6211-3732-40C0-867B-5E7A50A0D6FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D2E6211-3732-40C0-867B-5E7A50A0D6FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{642B1874-B1C2-43A3-9D6A-7053C325F39F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{642B1874-B1C2-43A3-9D6A-7053C325F39F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{642B1874-B1C2-43A3-9D6A-7053C325F39F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{642B1874-B1C2-43A3-9D6A-7053C325F39F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
