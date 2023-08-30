@@ -9,7 +9,7 @@ public partial class MainPage : ContentPage
 	public MainPage()
 	{
 		InitializeComponent();
-		//count = VulkanLoader.CreateVulkan(Array.Empty<string>());
+		count = VulkanLoader.CreateVulkan(Array.Empty<string>());
     }
 
 	private void OnCounterClicked(object sender, EventArgs e)
