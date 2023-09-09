@@ -33,13 +33,9 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
-	  <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
-	  <MtouchLink>Full</MtouchLink>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
-	  <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
-	  <MtouchLink>Full</MtouchLink>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
