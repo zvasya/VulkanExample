@@ -8,10 +8,9 @@
     <ApplicationId>com.companyname.android</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <RestoreAdditionalProjectSources>$(MSBuildThisFileDirectory)../LocalPackages</RestoreAdditionalProjectSources>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Silk.NET.Vulkan" Version="2.17.1" />
+    <PackageReference Include="Silk.NET.Vulkan" Version="2.17.1-build3775.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
