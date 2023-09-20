@@ -155,4 +155,37 @@ public unsafe partial class Surface
         this._swapChainImageFormat = surfaceFormat.Format;
         this._swapChainExtent = extent;
     }
+
+    void RecreateSwapChain()
+    {
+        _ = _vk.DeviceWaitIdle(_device);
+
+        CleanupSwapchain();
+
+        CreateSwapChain();
+        CreateImageViews();
+        CreateRenderPass();
+        CreateGraphicsPipeline();
+        CreateFramebuffers();
+        CreateCommandBuffers();
+    }
+
+    void CleanupSwapchain()
+    {
+        foreach (var framebuffer in _swapChainFramebuffers) 
+            _vk.DestroyFramebuffer(_device, framebuffer, null);
+
+        fixed (CommandBuffer* buffers = _commandBuffers) 
+            _vk.FreeCommandBuffers(_device, _commandPool, (uint)_commandBuffers.Length, buffers);
+
+        _vk.DestroyPipeline(_device, _graphicsPipeline, null);
+        _vk.DestroyPipelineLayout(_device, _pipelineLayout, null);
+        _vk.DestroyRenderPass(_device, _renderPass, null);
+
+        foreach (var imageView in _swapChainImageViews) 
+            _vk.DestroyImageView(_device, imageView, null);
+
+        _khrSwapchain.DestroySwapchain(_device, _swapChain, null);
+    }
+
 }

@@ -55,23 +55,7 @@ public unsafe partial class Surface : IDisposable
 
         _vk.DestroyCommandPool(_device, _commandPool, null);
 
-        foreach (var framebuffer in _swapChainFramebuffers)
-        {
-            _vk.DestroyFramebuffer(_device, framebuffer, null);
-        }
-
-        _vk.DestroyPipeline(_device, _graphicsPipeline, null);
-
-        _vk.DestroyPipelineLayout(_device, _pipelineLayout, null);
-
-        _vk.DestroyRenderPass(_device, _renderPass, null);
-
-        foreach (var imageView in _swapChainImageViews)
-        {
-            _vk.DestroyImageView(_device, imageView, null);
-        }
-
-        _khrSwapchain.DestroySwapchain(_device, _swapChain, null);
+        CleanupSwapchain();
 
         _vk.DestroyDevice(_device, null);
             

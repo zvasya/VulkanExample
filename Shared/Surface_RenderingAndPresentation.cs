@@ -7,6 +7,7 @@ public unsafe partial class Surface
 {
     Semaphore _imageAvailableSemaphore;
     Semaphore _renderFinishedSemaphore;
+    bool _framebufferResized;
 
     void CreateSemaphores()
     {
@@ -30,8 +31,16 @@ public unsafe partial class Surface
     {
         // Acquiring and image from the swap chain
         uint imageIndex;
-            
-        Helpers.CheckErrors(_khrSwapchain.AcquireNextImage(this._device, this._swapChain, ulong.MaxValue, this._imageAvailableSemaphore, default, &imageIndex));
+        var result = _khrSwapchain.AcquireNextImage(this._device, this._swapChain, ulong.MaxValue, this._imageAvailableSemaphore, default, &imageIndex);
+        if (result == Result.ErrorOutOfDateKhr)
+        {
+            RecreateSwapChain();
+            return;
+        }
+        else if (result != Result.Success && result != Result.SuboptimalKhr)
+        {
+            throw new Exception("failed to acquire swap chain image!");
+        }
 
         // Submitting the command buffer
         var waitSemaphores = stackalloc Semaphore[] { this._imageAvailableSemaphore };
@@ -65,9 +74,26 @@ public unsafe partial class Surface
             PImageIndices = &imageIndex,
             PResults = null, // Optional
         };
-            
-        Helpers.CheckErrors(_khrSwapchain.QueuePresent(this._presentQueue, &presentInfo));
+
+        result = _khrSwapchain.QueuePresent(this._presentQueue, &presentInfo);
+        
+        if (result == Result.ErrorOutOfDateKhr || result == Result.SuboptimalKhr || _framebufferResized)
+        {
+            _framebufferResized = false;
+            RecreateSwapChain();
+        }
+        else if (result != Result.Success)
+        {
+            throw new Exception("failed to present swap chain image!");
+        }
 
         Helpers.CheckErrors(_vk.QueueWaitIdle(this._presentQueue));
+    }
+
+    public void ChangeSize()
+    {
+        _framebufferResized = true;
+        RecreateSwapChain();
+        DrawFrame();
     }
 }

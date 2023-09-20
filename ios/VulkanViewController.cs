@@ -1,7 +1,6 @@
 using CoreAnimation;
 using ObjCRuntime;
 using Shared;
-using Silk.NET.Vulkan;
 
 namespace ios;
 
@@ -19,7 +18,7 @@ public class VulkanViewController : UIViewController
 
     CADisplayLink? _displayLink;
     HelloEngine _engine;
-    SurfaceKHR surfaceKhr;
+    Surface surface;
 
     [Export("viewDidLoad")]
     public override void ViewDidLoad()
@@ -30,9 +29,9 @@ public class VulkanViewController : UIViewController
         View!.ContentScaleFactor = UIScreen.MainScreen.NativeScale;
 
         _engine = HelloEngine.Create(new iOSPlatform());
-        _engine.CreateSurface(() =>
+        surface = _engine.CreateSurface(() =>
         {
-            _engine.CreateMetalSurface(View.Layer.GetHandle(), out surfaceKhr);
+            _engine.CreateMetalSurface(View.Layer.GetHandle(), out var surfaceKhr);
             return surfaceKhr;
         });
         
@@ -45,6 +44,12 @@ public class VulkanViewController : UIViewController
     void RenderLoop()
     {
         _engine.DrawFrame();
+    }
+
+    public override void ViewDidLayoutSubviews()
+    {
+        base.ViewDidLayoutSubviews();
+        surface.ChangeSize();
     }
 
     public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)

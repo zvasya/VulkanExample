@@ -55,9 +55,11 @@ public unsafe partial class HelloEngine : IDisposable
 
     readonly List<Surface> _surfaces = new();
 
-    public void CreateSurface(Func<SurfaceKHR> factory)
+    public Surface CreateSurface(Func<SurfaceKHR> factory)
     {
-        _surfaces.Add(Surface.Create(this, factory));
+        var surface = Surface.Create(this, factory);
+        _surfaces.Add(surface);
+        return surface;
     }
 
     void Init()
