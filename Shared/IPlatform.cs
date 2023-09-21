@@ -4,7 +4,8 @@ public interface IPlatform
 {
     bool EnableValidationLayers { get; }
 
-    string[] RequiredExtensions { get; }
+    string[] InstanceExtensions { get; }
+    string[] DeviceExtensions { get; }
     
     byte[] GetVertShader();
     byte[] GetFragShader();

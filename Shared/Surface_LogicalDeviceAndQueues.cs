@@ -9,7 +9,6 @@ public unsafe partial class Surface
 {
     readonly string[] _deviceExtensions = {
         "VK_KHR_swapchain",
-        "VK_KHR_portability_subset",
     };
 
     Device _device;
@@ -40,11 +39,12 @@ public unsafe partial class Surface
 
         PhysicalDeviceFeatures deviceFeatures = default;
 
-        var deviceExtensionsCount = _deviceExtensions.Length;
+        var deviceExtensions = _deviceExtensions.Union(_engine.Platform.DeviceExtensions).ToArray();
+        var deviceExtensionsCount = deviceExtensions.Length;
         var deviceExtensionsArray = stackalloc IntPtr[deviceExtensionsCount];
         for (var i = 0; i < deviceExtensionsCount; i++)
         {
-            var extension = _deviceExtensions[i];
+            var extension = deviceExtensions[i];
             deviceExtensionsArray[i] = Marshal.StringToHGlobalAnsi(extension);
         }
 
@@ -60,7 +60,7 @@ public unsafe partial class Surface
         }
 
         createInfo.PEnabledFeatures = &deviceFeatures;
-        createInfo.EnabledExtensionCount = (uint)_deviceExtensions.Length;
+        createInfo.EnabledExtensionCount = (uint)deviceExtensions.Length;
         createInfo.PpEnabledExtensionNames = (byte**)deviceExtensionsArray;
 
         fixed (Device* devicePtr = &_device)

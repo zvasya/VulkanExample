@@ -5,7 +5,8 @@ namespace ios;
 public class iOSPlatform : Shared.IPlatform
 {
     public bool EnableValidationLayers => false;
-    public string[] RequiredExtensions => new[] {ExtMetalSurface.ExtensionName};
+    public string[] InstanceExtensions => new[] {ExtMetalSurface.ExtensionName};
+    public string[] DeviceExtensions => new[] { "VK_KHR_portability_subset" };
 
     public byte[] GetVertShader() => File.ReadAllBytes("Shaders/vert.spv");
 

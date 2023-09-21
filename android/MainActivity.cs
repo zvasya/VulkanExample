@@ -5,6 +5,9 @@ namespace android;
 [Activity(Label = "@string/app_name", MainLauncher = true)]
 public class MainActivity : Activity
 {
+    
+    HelloEngine? _engine;
+    
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -12,6 +15,10 @@ public class MainActivity : Activity
         // Set our view from the "main" layout resource
         SetContentView(Resource.Layout.activity_main);
 
-        VulkanLoader.CreateVulkan(Array.Empty<string>());
+        _engine = HelloEngine.Create(new AndroidPlatform());
+        
+        var layout = FindViewById<LinearLayout> (Resource.Id.Layout);
+        var vulkanView = new VulkanView(ApplicationContext!, _engine);
+        layout!.AddView(vulkanView);
     }
 }

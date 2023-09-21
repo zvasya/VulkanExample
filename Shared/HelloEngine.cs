@@ -53,6 +53,24 @@ public unsafe partial class HelloEngine : IDisposable
         extMetalSurface.CreateMetalSurface(_instance, &createInfo, null, out surface);
     }
 
+    public void CreateAndroidSurface(IntPtr window, out SurfaceKHR surface)
+    {
+        var createInfo = new AndroidSurfaceCreateInfoKHR
+        {
+            SType = StructureType.AndroidSurfaceCreateInfoKhr,
+            PNext = null,
+            Flags = 0,
+            Window = (IntPtr*)window,
+        };
+
+        if (!_vk!.TryGetInstanceExtension<KhrAndroidSurface>(_instance, out var khrAndroidSurface))
+        {
+            throw new NotSupportedException("khrAndroidSurface extension not found.");
+        }
+
+        Helpers.CheckErrors(khrAndroidSurface.CreateAndroidSurface(_instance, &createInfo, null, out surface));
+    }
+
     readonly List<Surface> _surfaces = new();
 
     public Surface CreateSurface(Func<SurfaceKHR> factory)
@@ -96,7 +114,7 @@ public unsafe partial class HelloEngine : IDisposable
 
         var availableExtension = availableExtensionProperties.Select(property => SilkMarshal.PtrToString(new IntPtr(property.ExtensionName), NativeStringEncoding.LPTStr)).ToArray();
 
-        var extensions = Platform.RequiredExtensions;
+        var extensions = Platform.InstanceExtensions;
         var requestedExtension = extensions.Concat(_instanceExtensions).Intersect(availableExtension).ToArray();
 
         createInfo.EnabledExtensionCount = (uint)requestedExtension.Length;
