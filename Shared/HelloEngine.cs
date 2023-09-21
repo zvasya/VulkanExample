@@ -41,19 +41,19 @@ public unsafe partial class HelloEngine : IDisposable
     }
 
 
-    public void CreateMetalSurface(IntPtr pLayer, out SurfaceKHR surface)
+    public static void CreateMetalSurface(HelloEngine engine, IntPtr pLayer, out SurfaceKHR surface)
     {
         var createInfo = new MetalSurfaceCreateInfoEXT { SType = StructureType.MetalSurfaceCreateInfoExt, PNext = null, Flags = 0, PLayer = (IntPtr*)pLayer };
 
-        if (!_vk!.TryGetInstanceExtension<ExtMetalSurface>(_instance, out var extMetalSurface))
+        if (!engine._vk!.TryGetInstanceExtension<ExtMetalSurface>(engine._instance, out var extMetalSurface))
         {
             throw new NotSupportedException("extMetalSurface extension not found.");
         }
 
-        extMetalSurface.CreateMetalSurface(_instance, &createInfo, null, out surface);
+        extMetalSurface.CreateMetalSurface(engine._instance, &createInfo, null, out surface);
     }
 
-    public void CreateAndroidSurface(IntPtr window, out SurfaceKHR surface)
+    public static void CreateAndroidSurface(HelloEngine engine, IntPtr window, out SurfaceKHR surface)
     {
         var createInfo = new AndroidSurfaceCreateInfoKHR
         {
@@ -63,12 +63,12 @@ public unsafe partial class HelloEngine : IDisposable
             Window = (IntPtr*)window,
         };
 
-        if (!_vk!.TryGetInstanceExtension<KhrAndroidSurface>(_instance, out var khrAndroidSurface))
+        if (!engine._vk!.TryGetInstanceExtension<KhrAndroidSurface>(engine._instance, out var khrAndroidSurface))
         {
             throw new NotSupportedException("khrAndroidSurface extension not found.");
         }
 
-        Helpers.CheckErrors(khrAndroidSurface.CreateAndroidSurface(_instance, &createInfo, null, out surface));
+        Helpers.CheckErrors(khrAndroidSurface.CreateAndroidSurface(engine._instance, &createInfo, null, out surface));
     }
 
     readonly List<Surface> _surfaces = new();

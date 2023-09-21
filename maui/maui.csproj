@@ -63,6 +63,17 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Shared\Shared.csproj" />
+		<ProjectReference Include="..\VulkanView.Maui\VulkanView.Maui.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <BundleResource Include="Resources\Raw\Shaders\frag.spv">
+	    <Link>Resources\Shaders\frag.spv</Link>
+	    <IsDefaultItem>true</IsDefaultItem>
+	  </BundleResource>
+	  <BundleResource Include="Resources\Raw\Shaders\vert.spv">
+	    <Link>Resources\Shaders\vert.spv</Link>
+	    <IsDefaultItem>true</IsDefaultItem>
+	  </BundleResource>
 	</ItemGroup>
 
 </Project>

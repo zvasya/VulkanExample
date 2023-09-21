@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using VulkanView.Maui.Views;
 
 namespace maui;
 
@@ -9,6 +10,7 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+            .UseMauiVulkanView()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

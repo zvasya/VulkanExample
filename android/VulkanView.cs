@@ -60,7 +60,7 @@ public sealed class VulkanView : SurfaceView, ISurfaceHolderCallback
     {
         _surface = _engine.CreateSurface(() =>
         {
-            _engine.CreateAndroidSurface(_aNativeWindow, out var surfaceKhr);
+            HelloEngine.CreateAndroidSurface(_engine, _aNativeWindow, out var surfaceKhr);
             return surfaceKhr;
         });
     }

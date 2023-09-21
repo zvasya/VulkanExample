@@ -31,7 +31,7 @@ public class VulkanViewController : UIViewController
         _engine = HelloEngine.Create(new iOSPlatform());
         surface = _engine.CreateSurface(() =>
         {
-            _engine.CreateMetalSurface(View.Layer.GetHandle(), out var surfaceKhr);
+            HelloEngine.CreateMetalSurface(_engine, View.Layer.GetHandle(), out var surfaceKhr);
             return surfaceKhr;
         });
         
