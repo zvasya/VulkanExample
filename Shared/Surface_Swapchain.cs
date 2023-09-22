@@ -87,6 +87,11 @@ public unsafe partial class Surface
 
         var actualExtent = new Extent2D(100, 100);
 
+        if (capabilities.MaxImageExtent.Width < 1 || capabilities.MaxImageExtent.Height < 1)
+        {
+            _framebufferResized = true;
+        }
+
         actualExtent.Width = Math.Max(capabilities.MinImageExtent.Width, Math.Min(capabilities.MaxImageExtent.Width, actualExtent.Width));
         actualExtent.Height = Math.Max(capabilities.MinImageExtent.Height, Math.Min(capabilities.MaxImageExtent.Height, actualExtent.Height));
 
@@ -167,6 +172,9 @@ public unsafe partial class Surface
         CreateRenderPass();
         CreateGraphicsPipeline();
         CreateFramebuffers();
+        CreateUniformBuffers();
+        CreateDescriptorPool();
+        CreateDescriptorSets();
         CreateCommandBuffers();
     }
 
@@ -186,6 +194,14 @@ public unsafe partial class Surface
             _vk.DestroyImageView(_device, imageView, null);
 
         _khrSwapchain.DestroySwapchain(_device, _swapChain, null);
+        
+        for (var i = 0; i < _swapChainImages.Length; i++)
+        {
+            _vk.DestroyBuffer(_device, _uniformBuffers![i], null);
+            _vk.FreeMemory(_device, _uniformBuffersMemory![i], null);
+        }
+        
+        _vk.DestroyDescriptorPool(_device, _descriptorPool, null);
     }
 
 }

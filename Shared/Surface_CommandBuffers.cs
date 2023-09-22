@@ -1,4 +1,5 @@
 using Silk.NET.Vulkan;
+using Buffer = Silk.NET.Vulkan.Buffer;
 
 namespace Shared;
 
@@ -74,7 +75,21 @@ public unsafe partial class Surface
             // Draw
             _vk.CmdBindPipeline(this._commandBuffers[i], PipelineBindPoint.Graphics, this._graphicsPipeline);
 
-            _vk.CmdDraw(this._commandBuffers[i], 3, 1, 0, 0);
+            var vertexBuffers = new Buffer[] { _vertexBuffer };
+            var offsets = new ulong[] { 0 };
+
+            fixed (ulong* offsetsPtr = offsets)
+            fixed (Buffer* vertexBuffersPtr = vertexBuffers)
+            {
+                _vk.CmdBindVertexBuffers(_commandBuffers[i], 0, 1, vertexBuffersPtr, offsetsPtr);
+            }
+
+            _vk.CmdBindIndexBuffer(_commandBuffers[i], _indexBuffer, 0, IndexType.Uint16);
+
+            _vk.CmdBindDescriptorSets(_commandBuffers[i], PipelineBindPoint.Graphics, _pipelineLayout, 0, 1, _descriptorSets![i], 0, null);
+            
+            _vk.CmdDrawIndexed(_commandBuffers[i], (uint)_indices.Length, 1, 0, 0, 0);
+
 
             _vk.CmdEndRenderPass(this._commandBuffers[i]);
 

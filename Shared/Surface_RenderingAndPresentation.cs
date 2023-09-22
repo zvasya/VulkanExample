@@ -41,6 +41,8 @@ public unsafe partial class Surface
         {
             throw new Exception("failed to acquire swap chain image!");
         }
+        
+        UpdateUniformBuffer(imageIndex);
 
         // Submitting the command buffer
         var waitSemaphores = stackalloc Semaphore[] { this._imageAvailableSemaphore };
