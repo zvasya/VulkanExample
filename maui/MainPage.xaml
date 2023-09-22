@@ -10,9 +10,15 @@
             Padding="30,0"
             VerticalOptions="Center">
 
+            <Label
+                Text="MAUI + Silk.NET = "
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                HorizontalOptions="Center" />
+            
             <views:VulkanView
                 x:Name="vulkanView"
-                HeightRequest="200"
+                HeightRequest="400"
                 ViewCreated="vulkanView_ViewCreated"
                 ViewDestroyed="vulkanView_OnViewDestroyed"
                 DrawFrame="vulkanView_DrawFrame"
@@ -25,12 +31,6 @@
             <!--     SemanticProperties.Description="Cute dot net bot waving hi to you!" -->
             <!--     HeightRequest="200" -->
             <!--     HorizontalOptions="Center" /> -->
-
-            <Label
-                Text="Hello, World!"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
-                HorizontalOptions="Center" />
 
             <Label
                 Text="Welcome to .NET Multi-platform App UI"

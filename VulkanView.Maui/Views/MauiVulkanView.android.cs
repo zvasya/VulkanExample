@@ -51,6 +51,11 @@ public sealed class MauiVulkanView : SurfaceView, ISurfaceHolderCallback
     public void SurfaceCreated(ISurfaceHolder holder)
     {
         AcquireNativeWindow(holder);
+
+        // var a = Looper.MyLooper();
+        var r = new System.Threading.Timer(state => Invalidate(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(16));
+        
+        SetWillNotDraw(false);
     }
 
     public void SurfaceDestroyed(ISurfaceHolder holder)
