@@ -1,13 +1,14 @@
 ﻿using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
+using Silk.NET.Vulkan.Extensions.KHR;
 using static Shared.HelloEngine;
 
 namespace Shared;
 
 public unsafe partial class HelloPhysicalDevice
 {
-    readonly string[] _deviceExtensions = { "VK_KHR_swapchain" };
+    readonly string[] _deviceExtensions = { KhrSwapchain.ExtensionName };
     
     PhysicalDevice _physicalDevice;
 
