@@ -58,8 +58,8 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Silk.NET.Vulkan" Version="2.17.1-build3952.0" />
-		<PackageReference Include="Silk.NET.MoltenVK.Native" Version="2.17.1-build3952.0" />
+		<PackageReference Include="Silk.NET.Vulkan" Version="2.18.0" />
+		<PackageReference Include="Silk.NET.MoltenVK.Native" Version="2.18.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Shared\Shared.csproj" />

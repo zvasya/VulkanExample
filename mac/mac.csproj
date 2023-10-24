@@ -15,8 +15,8 @@
     <UseSGen>false</UseSGen>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Silk.NET.Vulkan" Version="2.17.1-build3952.0" />
-    <PackageReference Include="Silk.NET.Vulkan.Loader.Native" Version="2023.8.13" />
+    <PackageReference Include="Silk.NET.Vulkan" Version="2.18.0" />
+    <PackageReference Include="Silk.NET.Vulkan.Loader.Native" Version="2023.10.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
