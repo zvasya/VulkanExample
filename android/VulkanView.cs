@@ -35,6 +35,7 @@ public sealed class VulkanView : SurfaceView, ISurfaceHolderCallback
     public void SurfaceCreated(ISurfaceHolder holder)
     {
         AcquireNativeWindow(holder);
+        var r = new Timer(state => Invalidate(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(16));
     }
 
     public void SurfaceDestroyed(ISurfaceHolder holder)

@@ -6,7 +6,8 @@ public interface IPlatform
 
     string[] InstanceExtensions { get; }
     string[] DeviceExtensions { get; }
-    
+
     byte[] GetVertShader();
     byte[] GetFragShader();
+    Image<Rgba32> GetImage();
 }

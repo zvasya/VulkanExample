@@ -7,6 +7,8 @@ using Shared;
 using Silk.NET.Vulkan;
 using VulkanView.Maui.Views.Interfaces;
 using Silk.NET.Vulkan.Extensions.KHR;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace VulkanView.Maui.Core.Views;
 
@@ -97,6 +99,11 @@ public class AndroidPlatform : Shared.IPlatform
     public string[] DeviceExtensions => Array.Empty<string>();
     public byte[] GetVertShader() => Read("Shaders/vert.spv");
     public byte[] GetFragShader() => Read("Shaders/frag.spv");
+    public Image<Rgba32> GetImage()
+    {
+        using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture.jpg");
+        return SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(stream.Result);
+    }
 
     byte[] Read(string fileName)
     {

@@ -4,6 +4,8 @@ using ObjCRuntime;
 using Shared;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using UIKit;
 using VulkanView.Maui.Views.Interfaces;
 
@@ -83,5 +85,11 @@ public class iOSPlatform : Shared.IPlatform
         using var stream = FileSystem.OpenAppPackageFileAsync(fileName);
         using var reader = new BinaryReader(stream.Result);
         return reader.ReadBytes(10000);
+    }
+    
+    public Image<Rgba32> GetImage()
+    {
+        using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture.jpg");
+        return SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(stream.Result);
     }
 }

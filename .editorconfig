@@ -9,6 +9,13 @@ indent_style = space
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 spelling_exclusion_path = SpellingExclusions.dic
 
+# Microsoft .NET properties
+csharp_new_line_before_members_in_object_initializers = true
+
+# ReSharper properties
+resharper_wrap_object_and_collection_initializer_style = chop_always
+
+
 # Code files
 [*.{cs,csx,vb,vbx}]
 indent_size = 4

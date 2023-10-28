@@ -1,8 +1,9 @@
-﻿using Shared;
+﻿using Android.Content.PM;
+using Shared;
 
 namespace android;
 
-[Activity(Label = "@string/app_name", MainLauncher = true)]
+[Activity(Label = "@string/app_name", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
 public class MainActivity : Activity
 {
     

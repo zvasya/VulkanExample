@@ -1,180 +1,109 @@
+using Silk.NET.Maths;
 using Silk.NET.Vulkan;
-using Silk.NET.Vulkan.Extensions.KHR;
-using Buffer = Silk.NET.Vulkan.Buffer;
 
 namespace Shared;
 
 public unsafe partial class Surface : IDisposable
 {
-    readonly KhrSurface _vkSurface;
-    readonly Vk _vk;
-    readonly SurfaceKHR _surface;
-    readonly Instance _instance;
     readonly HelloEngine _engine;
+    readonly SurfaceKHR _surface;
+
+    LogicalDevice _device;
+    SwapChainSupportDetails _swapChainSupport;
+    SurfaceFormatKHR _surfaceFormat;
+    Format _depthFormat;
+    
+    HelloRenderPass _renderPass;
 
     Surface(HelloEngine engine, Func<SurfaceKHR> createSurface)
     {
         _engine = engine;
-        _vkSurface = engine._vkSurface;
-        _instance = engine._instance;
-        _vk = engine._vk!;
-
         _surface = createSurface();
     }
 
     public static Surface Create(HelloEngine engine, Func<SurfaceKHR> createSurface)
     {
         var surface = new Surface(engine, createSurface);
-
-        surface.PickPhysicalDevice();
-
-        surface.CreateLogicalDevice();
-
-        surface.CreateSwapChain();
-
-        surface.CreateImageViews();
-
-        surface.CreateRenderPass();
-        
-        surface.CreateDescriptorSetLayout();
-
-        surface.CreateGraphicsPipeline();
-
-        surface.CreateFramebuffers();
-
-        surface.CreateCommandPool();
-        
-        surface.CreateVertexBuffer();
-        
-        surface.CreateIndexBuffer();
-        
-        surface.CreateUniformBuffers();
-        
-        surface.CreateDescriptorPool();
-        surface.CreateDescriptorSets();
-
-        surface.CreateCommandBuffers();
-
-        surface.CreateSemaphores();
-
+        surface.Init();
         return surface;
+    }
+
+    void Init()
+    {
+        var physicalDevice = PickPhysicalDevice();
+        _device = physicalDevice.CreateLogicalDevice();
+
+        _swapChainSupport = _device.PhysicalDevice.QuerySwapChainSupport(_surface);
+        _surfaceFormat = HelloPhysicalDevice.ChooseSwapSurfaceFormat(_swapChainSupport._formats);
+        _depthFormat = _device.PhysicalDevice.FindDepthFormat();
+        CreateDescriptorPool();
+        
+        // @@@ EXTERNAL
+        _renderPass = HelloRenderPass.Create(_device, _surfaceFormat.Format, _depthFormat);
+        _graphicsPipeline = HelloPipeline.Create(_device, _engine.Platform.GetVertShader(), _engine.Platform.GetFragShader(), _renderPass);
+        
+        CreateCommandBuffers();
+        CreateSyncObjects(HelloEngine.MAX_FRAMES_IN_FLIGHT);
+        
+        
+        CreateSwapChain2();
+        CreateImageViews2();
+        CreateDepthResources2();
+        CreateFramebuffers2();
+
+        using (var img = _engine.Platform.GetImage())
+        {
+            CreateTextureImage(img);   
+        }
+        CreateTextureImageView();
+        CreateTextureSampler();
+        
+        _renderer.Add(RendererNode.Create(_device, 4, new Vector3D<float>(0,0,0.5f) ));
+        _renderer.Add(RendererNode.Create(_device, 2, Vector3D<float>.Zero ));
+        _renderer.Add(RendererNode.Create(_device, 3, new Vector3D<float>(0,0,-0.5f) ));
+        _renderer.Add(RendererNode.Create(_device, 5, new Vector3D<float>(0,0,1.0f) ));
+        _renderer.Add(RendererNode.Create(_device, 1, new Vector3D<float>(0,0,-1.0f) ));
+        
+        foreach (var rendererNode in _renderer) 
+            rendererNode.CreateUniformBuffers(_descriptorPool, _graphicsPipeline.DescriptorSetLayout, _textureImageView.ImageView, _textureSampler);
+    }
+
+    HelloPhysicalDevice PickPhysicalDevice()
+    {
+        return HelloPhysicalDevice.PickPhysicalDevice(_surface, _engine);
     }
 
     public void Dispose()
     {
-        _vk.DestroySemaphore(_device, _renderFinishedSemaphore, null);
-        _vk.DestroySemaphore(_device, _imageAvailableSemaphore, null);
-
-        _vk.DestroyCommandPool(_device, _commandPool, null);
-
         CleanupSwapchain();
+
+        _graphicsPipeline.Dispose();
+        _renderPass.Dispose();
+
+        foreach (var rendererNode in _renderer)
+            rendererNode.ResetUniformBuffers();
+
+        _descriptorPool.Dispose();
+
+        _device.DestroySampler(_textureSampler, null);
+        _textureImageView.Dispose();
+
+        _textureImage.Dispose();
+
+        foreach (var rendererNode in _renderer)
+        {
+            rendererNode.Dispose();
+        }
         
-        _vk!.DestroyBuffer(_device, _indexBuffer, null);
-        _vk!.FreeMemory(_device, _indexBufferMemory, null);
-
-        _vk!.DestroyBuffer(_device, _vertexBuffer, null);
-        _vk!.FreeMemory(_device, _vertexBufferMemory, null);
-        
-        _vk!.DestroyDescriptorSetLayout(_device, _descriptorSetLayout, null);
-
-        _vk.DestroyDevice(_device, null);
-            
-        _vkSurface.DestroySurface(_instance, _surface, null);
-    }
-
-    void CreateBuffer(ulong size, BufferUsageFlags usage, MemoryPropertyFlags properties, ref Buffer buffer, ref DeviceMemory bufferMemory)
-    {
-        BufferCreateInfo bufferInfo = new()
+        for (var i = 0; i < _renderFinishedSemaphores.Length; i++)
         {
-            SType = StructureType.BufferCreateInfo,
-            Size = size,
-            Usage = usage,
-            SharingMode = SharingMode.Exclusive,
-        };
-
-        fixed (Buffer* bufferPtr = &buffer)
-        {
-            if (_vk.CreateBuffer(_device, bufferInfo, null, bufferPtr) != Result.Success)
-            {
-                throw new Exception("failed to create vertex buffer!");
-            }
+            _renderFinishedSemaphores[i].Dispose();
+            _imageAvailableSemaphores[i].Dispose();
+            _inFlightFences[i].Dispose();
         }
 
-        MemoryRequirements memRequirements = new();
-        _vk.GetBufferMemoryRequirements(_device, buffer, out memRequirements);
+        _device.Dispose();
 
-        MemoryAllocateInfo allocateInfo = new()
-        {
-            SType = StructureType.MemoryAllocateInfo,
-            AllocationSize = memRequirements.Size,
-            MemoryTypeIndex = FindMemoryType(memRequirements.MemoryTypeBits, properties),
-        };
-
-        fixed (DeviceMemory* bufferMemoryPtr = &bufferMemory)
-        {
-            if (_vk.AllocateMemory(_device, allocateInfo, null, bufferMemoryPtr) != Result.Success)
-            {
-                throw new Exception("failed to allocate vertex buffer memory!");
-            }
-        }
-
-        _vk.BindBufferMemory(_device, buffer, bufferMemory, 0);
-    }
-    
-    uint FindMemoryType(uint typeFilter, MemoryPropertyFlags properties)
-    {
-        _vk.GetPhysicalDeviceMemoryProperties(_physicalDevice, out var memProperties);
-
-        for (var i = 0; i < memProperties.MemoryTypeCount; i++)
-        {
-            if ((typeFilter & (1 << i)) != 0 && (memProperties.MemoryTypes[i].PropertyFlags & properties) == properties)
-            {
-                return (uint)i;
-            }
-        }
-
-        throw new Exception("failed to find suitable memory type!");
-    }
-    
-    void CopyBuffer(Buffer srcBuffer, Buffer dstBuffer, ulong size)
-    {
-        CommandBufferAllocateInfo allocateInfo = new()
-        {
-            SType = StructureType.CommandBufferAllocateInfo,
-            Level = CommandBufferLevel.Primary,
-            CommandPool = _commandPool,
-            CommandBufferCount = 1,
-        };
-
-        _vk.AllocateCommandBuffers(_device, allocateInfo, out CommandBuffer commandBuffer);
-
-        CommandBufferBeginInfo beginInfo = new()
-        {
-            SType = StructureType.CommandBufferBeginInfo,
-            Flags = CommandBufferUsageFlags.OneTimeSubmitBit,
-        };
-
-        _vk.BeginCommandBuffer(commandBuffer, beginInfo);
-
-        BufferCopy copyRegion = new()
-        {
-            Size = size,
-        };
-
-        _vk.CmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, copyRegion);
-
-        _vk.EndCommandBuffer(commandBuffer);
-
-        SubmitInfo submitInfo = new()
-        {
-            SType = StructureType.SubmitInfo,
-            CommandBufferCount = 1,
-            PCommandBuffers = &commandBuffer,
-        };
-
-        _vk.QueueSubmit(_graphicsQueue, 1, submitInfo, default);
-        _vk.QueueWaitIdle(_graphicsQueue);
-
-        _vk.FreeCommandBuffers(_device, _commandPool, 1, commandBuffer);
+        _engine.DestroySurface(_surface, null);
     }
 }

@@ -10,7 +10,7 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Silk.NET.Vulkan" Version="2.17.1-build3775.0" />
+    <PackageReference Include="Silk.NET.Vulkan" Version="2.17.1-build3952.0" />
     <PackageReference Include="Xamarin.Essentials" Version="1.8.0" />
   </ItemGroup>
   <ItemGroup>
@@ -25,12 +25,16 @@
   <ItemGroup>
     <Folder Include="Assets\" />
     <Folder Include="Assets\Shaders\" />
+    <Folder Include="Assets\Textures\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Update="Assets\Shaders\frag.spv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AndroidAsset>
     <AndroidAsset Update="Assets\Shaders\vert.spv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AndroidAsset>
+    <AndroidAsset Update="Assets\Textures\texture.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AndroidAsset>
   </ItemGroup>

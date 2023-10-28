@@ -8,19 +8,23 @@ public unsafe partial class HelloEngine
 {
     internal class DebugUtils : IDisposable
     {
-        readonly HelloEngine _helloEngine;
         readonly ExtDebugUtils? _debugUtils;
+        readonly HelloEngine _helloEngine;
         DebugUtilsMessengerEXT _debugMessenger;
-    
+
         public DebugUtils(HelloEngine helloEngine)
         {
             _helloEngine = helloEngine;
-            
-            if (!_helloEngine.Platform.EnableValidationLayers)
-                return;
 
-            if (!_helloEngine._vk!.TryGetInstanceExtension(_helloEngine._instance, out _debugUtils))
+            if (!_helloEngine.Platform.EnableValidationLayers)
+            {
                 return;
+            }
+
+            if (!VK.TryGetInstanceExtension(_helloEngine._instance, out _debugUtils))
+            {
+                return;
+            }
 
             var createInfo = new DebugUtilsMessengerCreateInfoEXT();
             PopulateDebugMessengerCreateInfo(ref createInfo);
@@ -35,6 +39,11 @@ public unsafe partial class HelloEngine
             }
         }
 
+        public void Dispose()
+        {
+            _debugUtils?.DestroyDebugUtilsMessenger(_helloEngine._instance, _debugMessenger, null);
+        }
+
         void PopulateDebugMessengerCreateInfo(ref DebugUtilsMessengerCreateInfoEXT createInfo)
         {
             createInfo.SType = StructureType.DebugUtilsMessengerCreateInfoExt;
@@ -44,7 +53,7 @@ public unsafe partial class HelloEngine
             createInfo.MessageType = DebugUtilsMessageTypeFlagsEXT.GeneralBitExt |
                                      DebugUtilsMessageTypeFlagsEXT.PerformanceBitExt |
                                      DebugUtilsMessageTypeFlagsEXT.ValidationBitExt;
-            createInfo.PfnUserCallback = (DebugUtilsMessengerCallbackFunctionEXT) DebugCallback;
+            createInfo.PfnUserCallback = (DebugUtilsMessengerCallbackFunctionEXT)DebugCallback;
         }
 
         uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
@@ -52,15 +61,10 @@ public unsafe partial class HelloEngine
             if (messageSeverity > DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt)
             {
                 Console.WriteLine
-                    ($"{messageSeverity} {messageTypes}" + Marshal.PtrToStringAnsi((nint) pCallbackData->PMessage));
+                    ($"{messageSeverity} {messageTypes}" + Marshal.PtrToStringAnsi((nint)pCallbackData->PMessage));
             }
 
             return Vk.False;
-        }
-
-        public void Dispose()
-        {
-            _debugUtils?.DestroyDebugUtilsMessenger(_helloEngine._instance, _debugMessenger, null);
         }
     }
 }

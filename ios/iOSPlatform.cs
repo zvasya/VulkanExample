@@ -1,4 +1,6 @@
 using Silk.NET.Vulkan.Extensions.EXT;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace ios;
 
@@ -11,4 +13,9 @@ public class iOSPlatform : Shared.IPlatform
     public byte[] GetVertShader() => File.ReadAllBytes("Shaders/vert.spv");
 
     public byte[] GetFragShader() => File.ReadAllBytes("Shaders/frag.spv");
+    
+    public Image<Rgba32> GetImage()
+    {
+        return SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>("Textures/texture.jpg");
+    }
 }

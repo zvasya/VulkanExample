@@ -1,17 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup>
-        <PackageReference Include="Silk.NET.Maths" Version="2.17.1" />
-        <PackageReference Include="Silk.NET.Vulkan" Version="2.17.1-build3775.0" />
-        <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.17.1-build3775.0" />
-        <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.17.1-build3775.0" />
+        <PackageReference Include="Silk.NET.Maths" Version="2.17.1"/>
+        <PackageReference Include="Silk.NET.Vulkan" Version="2.17.1-build3952.0" />
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.17.1-build3952.0" />
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.17.1-build3952.0" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
     </ItemGroup>
 
 </Project>

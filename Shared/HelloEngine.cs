@@ -9,33 +9,48 @@ namespace Shared;
 
 public unsafe partial class HelloEngine : IDisposable
 {
-    internal readonly IPlatform Platform;
+    internal static Vk VK = null!;
+    internal static KhrSurface VkSurface = null!;
+    static readonly string[] _instanceExtensions = { KhrSurface.ExtensionName, ExtDebugUtils.ExtensionName };
 
-    internal Instance _instance;
-    internal Vk? _vk;
-    internal KhrSurface? _vkSurface;
+    public const int MAX_FRAMES_IN_FLIGHT = 2;
+    readonly List<Surface> _surfaces = new();
 
-    DebugUtils? _debug;
-
-    string[]? _validationLayers;
-    readonly string[] _instanceExtensions = { KhrSurface.ExtensionName, ExtDebugUtils.ExtensionName };
-
-    readonly string[][] _validationLayerNamesPriorityList =
+    static readonly string[][] _validationLayerNamesPriorityList =
     {
         new[] { "VK_LAYER_KHRONOS_validation" },
         new[] { "VK_LAYER_LUNARG_standard_validation" },
         new[] { "VK_LAYER_GOOGLE_threading", "VK_LAYER_LUNARG_parameter_validation", "VK_LAYER_LUNARG_object_tracker", "VK_LAYER_LUNARG_core_validation", "VK_LAYER_GOOGLE_unique_objects" },
     };
 
-    HelloEngine(IPlatform platform)
+    internal readonly IPlatform Platform;
+
+    DebugUtils? _debug;
+
+    readonly Instance _instance;
+
+    HelloEngine(IPlatform platform, Instance instance)
     {
         Platform = platform;
+        _instance = instance;
+    }
+
+
+    public void Dispose()
+    {
+        foreach (var t in _surfaces)
+        {
+            t.Dispose();
+        }
+
+        _debug?.Dispose();
+        DestroyInstance(null);
     }
 
     public static HelloEngine Create(IPlatform platform)
     {
-        var engine = new HelloEngine(platform);
-        engine.Init();
+        var instance = Init(platform, _instanceExtensions, _validationLayerNamesPriorityList, out var validationLayers);
+        var engine = new HelloEngine(platform, instance);
         engine._debug = new DebugUtils(engine);
         return engine;
     }
@@ -45,7 +60,7 @@ public unsafe partial class HelloEngine : IDisposable
     {
         var createInfo = new MetalSurfaceCreateInfoEXT { SType = StructureType.MetalSurfaceCreateInfoExt, PNext = null, Flags = 0, PLayer = (IntPtr*)pLayer };
 
-        if (!engine._vk!.TryGetInstanceExtension<ExtMetalSurface>(engine._instance, out var extMetalSurface))
+        if (!VK.TryGetInstanceExtension<ExtMetalSurface>(engine._instance, out var extMetalSurface))
         {
             throw new NotSupportedException("extMetalSurface extension not found.");
         }
@@ -57,21 +72,16 @@ public unsafe partial class HelloEngine : IDisposable
     {
         var createInfo = new AndroidSurfaceCreateInfoKHR
         {
-            SType = StructureType.AndroidSurfaceCreateInfoKhr,
-            PNext = null,
-            Flags = 0,
-            Window = (IntPtr*)window,
+            SType = StructureType.AndroidSurfaceCreateInfoKhr, PNext = null, Flags = 0, Window = (IntPtr*)window,
         };
 
-        if (!engine._vk!.TryGetInstanceExtension<KhrAndroidSurface>(engine._instance, out var khrAndroidSurface))
+        if (!VK.TryGetInstanceExtension<KhrAndroidSurface>(engine._instance, out var khrAndroidSurface))
         {
             throw new NotSupportedException("khrAndroidSurface extension not found.");
         }
 
         Helpers.CheckErrors(khrAndroidSurface.CreateAndroidSurface(engine._instance, &createInfo, null, out surface));
     }
-
-    readonly List<Surface> _surfaces = new();
 
     public Surface CreateSurface(Func<SurfaceKHR> factory)
     {
@@ -80,14 +90,15 @@ public unsafe partial class HelloEngine : IDisposable
         return surface;
     }
 
-    void Init()
+    static Instance Init(IPlatform platform, string[] instanceExtensions, string[][] validationLayerNamesPriorityList, out string[]? validationLayers)
     {
-        _vk = Vk.GetApi();
+        VK = Vk.GetApi();
 
-        if (Platform.EnableValidationLayers)
+        validationLayers = null;
+        if (platform.EnableValidationLayers)
         {
-            _validationLayers = GetOptimalValidationLayers();
-            if (_validationLayers is null)
+            validationLayers = GetOptimalValidationLayers(validationLayerNamesPriorityList);
+            if (validationLayers is null)
             {
                 throw new NotSupportedException("Validation layers requested, but not available!");
             }
@@ -106,24 +117,26 @@ public unsafe partial class HelloEngine : IDisposable
         var createInfo = new InstanceCreateInfo { SType = StructureType.InstanceCreateInfo, PApplicationInfo = &appInfo };
 
         uint availableExtensionCount;
-        _vk.EnumerateInstanceExtensionProperties((string)null!, &availableExtensionCount, null);
+        VK.EnumerateInstanceExtensionProperties((string)null!, &availableExtensionCount, null);
 
         var availableExtensionProperties = new ExtensionProperties[availableExtensionCount];
         fixed (ExtensionProperties* instanceExtensionPtr = availableExtensionProperties)
-            _vk.EnumerateInstanceExtensionProperties((string)null!, &availableExtensionCount, instanceExtensionPtr);
+        {
+            VK.EnumerateInstanceExtensionProperties((string)null!, &availableExtensionCount, instanceExtensionPtr);
+        }
 
         var availableExtension = availableExtensionProperties.Select(property => SilkMarshal.PtrToString(new IntPtr(property.ExtensionName), NativeStringEncoding.LPTStr)).ToArray();
 
-        var extensions = Platform.InstanceExtensions;
-        var requestedExtension = extensions.Concat(_instanceExtensions).Intersect(availableExtension).ToArray();
+        var extensions = platform.InstanceExtensions;
+        var requestedExtension = extensions.Concat(instanceExtensions).Intersect(availableExtension).ToArray();
 
         createInfo.EnabledExtensionCount = (uint)requestedExtension.Length;
         createInfo.PpEnabledExtensionNames = (byte**)SilkMarshal.StringArrayToPtr(requestedExtension);
 
-        if (Platform.EnableValidationLayers)
+        if (validationLayers != null)
         {
-            createInfo.EnabledLayerCount = (uint)_validationLayers!.Length;
-            createInfo.PpEnabledLayerNames = (byte**)SilkMarshal.StringArrayToPtr(_validationLayers!);
+            createInfo.EnabledLayerCount = (uint)validationLayers!.Length;
+            createInfo.PpEnabledLayerNames = (byte**)SilkMarshal.StringArrayToPtr(validationLayers!);
         }
         else
         {
@@ -132,19 +145,21 @@ public unsafe partial class HelloEngine : IDisposable
         }
 
         if (availableExtension.Contains("VK_KHR_portability_enumeration"))
-            createInfo.Flags = InstanceCreateFlags.EnumeratePortabilityBitKhr;
-
-        fixed (Instance* instance = &_instance)
         {
-            if (_vk.CreateInstance(&createInfo, null, instance) != Result.Success)
+            createInfo.Flags = InstanceCreateFlags.EnumeratePortabilityBitKhr;
+        }
+
+        Instance instance;
+        {
+            if (VK.CreateInstance(&createInfo, null, &instance) != Result.Success)
             {
                 throw new Exception("Failed to create instance!");
             }
         }
 
-        _vk.CurrentInstance = _instance;
+        VK.CurrentInstance = instance;
 
-        if (!_vk.TryGetInstanceExtension(_instance, out _vkSurface))
+        if (!VK.TryGetInstanceExtension(instance, out VkSurface))
         {
             throw new NotSupportedException("KHR_surface extension not found.");
         }
@@ -152,25 +167,27 @@ public unsafe partial class HelloEngine : IDisposable
         Marshal.FreeHGlobal((nint)appInfo.PApplicationName);
         Marshal.FreeHGlobal((nint)appInfo.PEngineName);
 
-        if (Platform.EnableValidationLayers)
+        if (platform.EnableValidationLayers)
         {
             SilkMarshal.Free((nint)createInfo.PpEnabledLayerNames);
         }
+
+        return instance;
     }
 
-    string[]? GetOptimalValidationLayers()
+    static string[]? GetOptimalValidationLayers(string[][] validationLayerNamesPriorityList)
     {
         var layerCount = 0u;
-        _vk!.EnumerateInstanceLayerProperties(&layerCount, (LayerProperties*)0);
+        VK.EnumerateInstanceLayerProperties(&layerCount, (LayerProperties*)0);
 
         var availableLayers = new LayerProperties[layerCount];
         fixed (LayerProperties* availableLayersPtr = availableLayers)
         {
-            _vk.EnumerateInstanceLayerProperties(&layerCount, availableLayersPtr);
+            VK.EnumerateInstanceLayerProperties(&layerCount, availableLayersPtr);
         }
 
         var availableLayerNames = availableLayers.Select(availableLayer => Marshal.PtrToStringAnsi((nint)availableLayer.LayerName)).ToArray();
-        foreach (var validationLayerNameSet in _validationLayerNamesPriorityList)
+        foreach (var validationLayerNameSet in validationLayerNamesPriorityList)
         {
             if (validationLayerNameSet.All(validationLayerName => availableLayerNames.Contains(validationLayerName)))
             {
@@ -187,15 +204,5 @@ public unsafe partial class HelloEngine : IDisposable
         {
             surface.DrawFrame();
         }
-    }
-
-
-    public void Dispose()
-    {
-        foreach (var t in _surfaces)
-            t.Dispose();
-        
-        _debug?.Dispose();
-        _vk!.DestroyInstance(_instance, null);
     }
 }

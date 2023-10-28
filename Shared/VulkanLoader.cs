@@ -5,20 +5,18 @@ namespace Shared;
 
 public class VulkanLoader
 {
-    static readonly string[] CommonExtensions = {
-            "VK_KHR_surface",
-        };
+    static readonly string[] CommonExtensions = { "VK_KHR_surface" };
 
     public static unsafe uint CreateVulkan(IEnumerable<string> platformExtensions)
     {
         var appInfo = new ApplicationInfo
         {
             SType = StructureType.ApplicationInfo,
-            PApplicationName = (byte*)System.Runtime.InteropServices.Marshal.StringToHGlobalAnsi("Hello Triangle"),
-            ApplicationVersion = Vk.MakeVersion(1, 0, 0),
-            PEngineName = (byte*)System.Runtime.InteropServices.Marshal.StringToHGlobalAnsi("No Engine"),
-            EngineVersion = Vk.MakeVersion(1, 0, 0),
-            ApiVersion = Vk.MakeVersion(1, 2, 0),
+            PApplicationName = (byte*)Marshal.StringToHGlobalAnsi("Hello Triangle"),
+            ApplicationVersion = Vk.MakeVersion(1, 0),
+            PEngineName = (byte*)Marshal.StringToHGlobalAnsi("No Engine"),
+            EngineVersion = Vk.MakeVersion(1, 0),
+            ApiVersion = Vk.MakeVersion(1, 2),
         };
 
         InstanceCreateInfo createInfo = default;
@@ -30,6 +28,7 @@ public class VulkanLoader
         {
             extensionsToBytesArray[i] = Marshal.StringToHGlobalAnsi(extensions[i]);
         }
+
         createInfo.EnabledExtensionCount = (uint)extensions.Length;
         createInfo.PpEnabledExtensionNames = (byte**)extensionsToBytesArray;
 
