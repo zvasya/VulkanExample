@@ -5,7 +5,9 @@ namespace Shared;
 public unsafe partial class Surface
 {
     HelloSwapchain _swapChain;
+    readonly List<HelloTexture> _textures = new List<HelloTexture>();
     readonly List<RendererNode> _renderer = new List<RendererNode>();
+    CameraNode _camera;
 
     void CreateSwapChain2()
     {

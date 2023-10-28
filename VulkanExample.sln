@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "maui", "maui\maui.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VulkanView.Maui", "VulkanView.Maui\VulkanView.Maui.csproj", "{F4F31772-B029-4EC5-8229-96BDFD4D1155}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples", "Examples\Examples.csproj", "{FCF9D14D-0568-4792-A363-CBCD779B2C59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{F4F31772-B029-4EC5-8229-96BDFD4D1155}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4F31772-B029-4EC5-8229-96BDFD4D1155}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4F31772-B029-4EC5-8229-96BDFD4D1155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCF9D14D-0568-4792-A363-CBCD779B2C59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCF9D14D-0568-4792-A363-CBCD779B2C59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCF9D14D-0568-4792-A363-CBCD779B2C59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCF9D14D-0568-4792-A363-CBCD779B2C59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

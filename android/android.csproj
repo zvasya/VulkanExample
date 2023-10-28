@@ -14,6 +14,7 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.8.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Examples\Examples.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-using Silk.NET.Maths;
+using System.Runtime.CompilerServices;
 using Silk.NET.Vulkan;
 
 namespace Shared;
@@ -14,6 +14,7 @@ public unsafe partial class Surface : IDisposable
     Format _depthFormat;
     
     HelloRenderPass _renderPass;
+    readonly List<HelloPipeline> _graphicsPipelines = new List<HelloPipeline>();
 
     Surface(HelloEngine engine, Func<SurfaceKHR> createSurface)
     {
@@ -38,34 +39,57 @@ public unsafe partial class Surface : IDisposable
         _depthFormat = _device.PhysicalDevice.FindDepthFormat();
         CreateDescriptorPool();
         
-        // @@@ EXTERNAL
         _renderPass = HelloRenderPass.Create(_device, _surfaceFormat.Format, _depthFormat);
-        _graphicsPipeline = HelloPipeline.Create(_device, _engine.Platform.GetVertShader(), _engine.Platform.GetFragShader(), _renderPass);
         
         CreateCommandBuffers();
         CreateSyncObjects(HelloEngine.MAX_FRAMES_IN_FLIGHT);
-        
         
         CreateSwapChain2();
         CreateImageViews2();
         CreateDepthResources2();
         CreateFramebuffers2();
+    }
 
-        using (var img = _engine.Platform.GetImage())
-        {
-            CreateTextureImage(img);   
-        }
-        CreateTextureImageView();
-        CreateTextureSampler();
-        
-        _renderer.Add(RendererNode.Create(_device, 4, new Vector3D<float>(0,0,0.5f) ));
-        _renderer.Add(RendererNode.Create(_device, 2, Vector3D<float>.Zero ));
-        _renderer.Add(RendererNode.Create(_device, 3, new Vector3D<float>(0,0,-0.5f) ));
-        _renderer.Add(RendererNode.Create(_device, 5, new Vector3D<float>(0,0,1.0f) ));
-        _renderer.Add(RendererNode.Create(_device, 1, new Vector3D<float>(0,0,-1.0f) ));
-        
-        foreach (var rendererNode in _renderer) 
-            rendererNode.CreateUniformBuffers(_descriptorPool, _graphicsPipeline.DescriptorSetLayout, _textureImageView.ImageView, _textureSampler);
+    public HelloTexture CreateTexture(Image<Rgba32> img)
+    {
+        var texture = HelloTexture.Create(_device, img);
+        _textures.Add(texture);
+        return texture;
+    }
+
+    public HelloPipeline CreatePipeLine(byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions)
+    {
+        var pipeline = HelloPipeline.Create(_device, vertShaderCode, fragShaderCode, bindingDescription, attributeDescriptions, _renderPass);
+        _graphicsPipelines.Add(pipeline);
+        return pipeline;
+    }
+
+    public HelloIndexBuffer CreateIndexBuffer(ushort[] indices)
+    {
+        var indexBuffer = HelloIndexBuffer.Create(_device, (uint)indices.Length);
+        indexBuffer.FillStaging(indices, _device.CommandPool, _device.GraphicsQueue);
+        return indexBuffer;
+    }
+
+    public HelloVertexBuffer CreateVertexBuffer<T>(T[] vertices) where T : struct
+    {
+        var size = (ulong)(Unsafe.SizeOf<T>() * vertices.Length);
+        var vertexBuffer = HelloVertexBuffer.Create(_device, size);
+        vertexBuffer.FillStaging(vertices, _device.CommandPool, _device.GraphicsQueue);
+        return vertexBuffer;
+    }
+
+    public void RegisterCamera(CameraNode camera)
+    {
+        _camera = camera;
+    }
+
+    public RendererNode CreateRenderer(HelloPipeline pipeline, HelloVertexBuffer vertexBuffer, HelloIndexBuffer indexBuffer, HelloTexture texture)
+    {
+        var node = RendererNode.Create(_device, pipeline, vertexBuffer, indexBuffer, texture);
+        _renderer.Add(node);
+        node.CreateUniformBuffers(_descriptorPool);
+        return node;
     }
 
     HelloPhysicalDevice PickPhysicalDevice()
@@ -77,7 +101,9 @@ public unsafe partial class Surface : IDisposable
     {
         CleanupSwapchain();
 
-        _graphicsPipeline.Dispose();
+        foreach (var graphicsPipeline in _graphicsPipelines)
+            graphicsPipeline.Dispose();
+
         _renderPass.Dispose();
 
         foreach (var rendererNode in _renderer)
@@ -85,10 +111,8 @@ public unsafe partial class Surface : IDisposable
 
         _descriptorPool.Dispose();
 
-        _device.DestroySampler(_textureSampler, null);
-        _textureImageView.Dispose();
-
-        _textureImage.Dispose();
+        foreach (var texture in _textures) 
+            texture.Dispose();
 
         foreach (var rendererNode in _renderer)
         {

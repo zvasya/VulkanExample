@@ -60,6 +60,7 @@
     <PackageReference Include="Silk.NET.MoltenVK.Native" Version="2.18.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Examples\Examples.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 </Project>

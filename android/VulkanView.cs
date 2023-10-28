@@ -4,7 +4,11 @@ using Android.Views;
 using Java.Interop;
 using System.Runtime.InteropServices;
 using Android.Graphics;
+using Examples;
 using Shared;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using Xamarin.Essentials;
 using Surface = Shared.Surface;
 
 namespace android;
@@ -15,6 +19,7 @@ public sealed class VulkanView : SurfaceView, ISurfaceHolderCallback
     IntPtr _aNativeWindow = IntPtr.Zero;
     readonly HelloEngine _engine;
     Surface _surface;
+    Example1 _example1;
 
     public VulkanView(Context context, HelloEngine engine) : base(context)
     {
@@ -48,6 +53,7 @@ public sealed class VulkanView : SurfaceView, ISurfaceHolderCallback
 
     protected override void OnDraw(Canvas? canvas)
     {
+        _example1.Update();
         base.OnDraw(canvas);
         _surface.DrawFrame();
     }
@@ -64,17 +70,31 @@ public sealed class VulkanView : SurfaceView, ISurfaceHolderCallback
             HelloEngine.CreateAndroidSurface(_engine, _aNativeWindow, out var surfaceKhr);
             return surfaceKhr;
         });
+        _example1 = new Example1(_surface, GetVertShader, GetFragShader, GetImage1, GetImage2);
     }
+    
+    static byte[] GetVertShader() => Read("Shaders/vert.spv");
+    static byte[] GetFragShader() => Read("Shaders/frag.spv");
 
-    // protected void CreateDefaultInstance ()
-    // {
-    //     Instance = new Instance (new InstanceCreateInfo () {
-    //         EnabledExtensionNames = new string [] { "VK_KHR_surface", "VK_KHR_android_surface" },
-    //         ApplicationInfo = new ApplicationInfo () {
-    //             ApiVersion = Vulkan.Version.Make (1, 0, 0)
-    //         }
-    //     });
-    // }
+    static byte[] Read(string fileName)
+    {
+        using var stream = FileSystem.OpenAppPackageFileAsync(fileName);
+        using var memStream = new MemoryStream();
+        stream.Result.CopyTo(memStream);
+        return memStream.ToArray();
+    }
+    
+    static Image<Rgba32> GetImage1()
+    {
+        using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture.jpg");
+        return Image.Load<Rgba32>(stream.Result);
+    }
+    
+    static Image<Rgba32> GetImage2()
+    {
+        using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture2.jpg");
+        return Image.Load<Rgba32>(stream.Result);
+    }
 }
 
 internal static class NativeMethods

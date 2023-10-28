@@ -4,8 +4,6 @@ using ObjCRuntime;
 using Shared;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using UIKit;
 using VulkanView.Maui.Views.Interfaces;
 
@@ -47,6 +45,7 @@ public class MauiVulkanView : UIView
         
         if (firstTimeLoad)
         {
+            Layer.ContentsScale = UIScreen.MainScreen.Scale;
             _vulkanView.ViewCreated();
 
             float fps = 60;
@@ -76,20 +75,4 @@ public class iOSPlatform : Shared.IPlatform
     public bool EnableValidationLayers => false;
     public string[] InstanceExtensions => new[] {ExtMetalSurface.ExtensionName};
     public string[] DeviceExtensions => new[] { "VK_KHR_portability_subset" };
-
-    public byte[] GetVertShader() => Read("Shaders/vert.spv");
-    public byte[] GetFragShader() => Read("Shaders/frag.spv");
-
-    byte[] Read(string fileName)
-    {
-        using var stream = FileSystem.OpenAppPackageFileAsync(fileName);
-        using var reader = new BinaryReader(stream.Result);
-        return reader.ReadBytes(10000);
-    }
-    
-    public Image<Rgba32> GetImage()
-    {
-        using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture.jpg");
-        return SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(stream.Result);
-    }
 }

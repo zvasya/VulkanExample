@@ -19,6 +19,7 @@
     <PackageReference Include="Silk.NET.Vulkan.Loader.Native" Version="2023.10.6" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Examples\Examples.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 </Project>

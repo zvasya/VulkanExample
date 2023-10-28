@@ -23,12 +23,12 @@ public unsafe class HelloPipeline : IDisposable
         _graphicsPipeline = graphicsPipeline;
     }
 
-    public static HelloPipeline Create(LogicalDevice device, byte[] vertShaderCode, byte[] fragShaderCode, HelloRenderPass renderPass)
+    public static HelloPipeline Create(LogicalDevice device, byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions, HelloRenderPass renderPass)
     {
         var descriptorSetLayout = HelloDescriptorSetLayout.Create(device);
         var pipelineLayout = HelloPipelineLayout.Create(device, descriptorSetLayout);
         
-        var pipeline = CreatePipeline(device, vertShaderCode, fragShaderCode, renderPass, pipelineLayout);
+        var pipeline = CreatePipeline(device, vertShaderCode, fragShaderCode, bindingDescription, attributeDescriptions, renderPass, pipelineLayout);
         
         return new HelloPipeline(device, descriptorSetLayout, pipelineLayout, pipeline);
     }
@@ -52,7 +52,7 @@ public unsafe class HelloPipeline : IDisposable
         return shaderModule;
     }
 
-    static Pipeline CreatePipeline(LogicalDevice device, byte[] vertShaderCode, byte[] fragShaderCode, HelloRenderPass renderPass, HelloPipelineLayout pipelineLayout)
+    static Pipeline CreatePipeline(LogicalDevice device, byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions, HelloRenderPass renderPass, HelloPipelineLayout pipelineLayout)
     {
         Pipeline graphicsPipeline;
         var vertShaderModule = CreateShaderModule(device, vertShaderCode);
@@ -76,10 +76,7 @@ public unsafe class HelloPipeline : IDisposable
         };
 
         var shaderStages = stackalloc PipelineShaderStageCreateInfo[] { vertShaderStageInfo, fragShaderStageInfo };
-
-        var bindingDescription = RendererNode.Vertex.GetBindingDescription();
-        var attributeDescriptions = RendererNode.Vertex.GetAttributeDescriptions();
-
+        
         fixed (VertexInputAttributeDescription* attributeDescriptionsPtr = attributeDescriptions)
         {
             // Vertex Input

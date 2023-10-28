@@ -45,7 +45,7 @@ public unsafe partial class Surface
 
         foreach (var rendererNode in _renderer)
         {
-            rendererNode.UpdateUniformBuffer(_currentFrame, _swapChain);
+            rendererNode.UpdateUniformBuffer(_currentFrame, _swapChain, _camera);
         }
         
         _inFlightFences[_currentFrame].ResetFences();
@@ -170,7 +170,7 @@ public unsafe partial class Surface
         commandBuffer.CmdSetScissor(0, 1, &scissor);
         
         foreach (var rendererNode in _renderer) 
-            rendererNode.Draw(commandBuffer, _graphicsPipeline, currentFrame);
+            rendererNode.Draw(commandBuffer, currentFrame);
         
         commandBuffer.CmdEndRenderPass();
         Helpers.CheckErrors(commandBuffer.EndCommandBuffer());

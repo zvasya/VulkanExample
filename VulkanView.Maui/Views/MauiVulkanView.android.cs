@@ -7,8 +7,6 @@ using Shared;
 using Silk.NET.Vulkan;
 using VulkanView.Maui.Views.Interfaces;
 using Silk.NET.Vulkan.Extensions.KHR;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace VulkanView.Maui.Core.Views;
 
@@ -22,6 +20,7 @@ public sealed class MauiVulkanView : SurfaceView, ISurfaceHolderCallback
     IntPtr aNativeWindow = IntPtr.Zero;
 
     IVulkanView _vulkanView;
+    Timer _timer;
 
     public MauiVulkanView(Context context, Maui.Views.VulkanView vulkanView) : base(context)
     {
@@ -54,9 +53,8 @@ public sealed class MauiVulkanView : SurfaceView, ISurfaceHolderCallback
     {
         AcquireNativeWindow(holder);
 
-        // var a = Looper.MyLooper();
-        var r = new System.Threading.Timer(state => Invalidate(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(16));
-        
+        _timer = new Timer(_ => Invalidate(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(16));
+
         SetWillNotDraw(false);
     }
 
@@ -65,6 +63,7 @@ public sealed class MauiVulkanView : SurfaceView, ISurfaceHolderCallback
         if (aNativeWindow != IntPtr.Zero)
             NativeMethods.ANativeWindow_release(aNativeWindow);
 
+        _timer?.Dispose();
         aNativeWindow = IntPtr.Zero;
     }
 
@@ -97,20 +96,6 @@ public class AndroidPlatform : Shared.IPlatform
     public bool EnableValidationLayers => false;
     public string[] InstanceExtensions => new[] {KhrAndroidSurface.ExtensionName};
     public string[] DeviceExtensions => Array.Empty<string>();
-    public byte[] GetVertShader() => Read("Shaders/vert.spv");
-    public byte[] GetFragShader() => Read("Shaders/frag.spv");
-    public Image<Rgba32> GetImage()
-    {
-        using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture.jpg");
-        return SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(stream.Result);
-    }
-
-    byte[] Read(string fileName)
-    {
-        using var stream = FileSystem.OpenAppPackageFileAsync(fileName);
-        using var reader = new BinaryReader(stream.Result);
-        return reader.ReadBytes(10000);
-    }
 }
 
 internal static class NativeMethods

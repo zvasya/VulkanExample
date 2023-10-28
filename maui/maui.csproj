@@ -62,6 +62,7 @@
 		<PackageReference Include="Silk.NET.MoltenVK.Native" Version="2.18.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\Examples\Examples.csproj" />
 		<ProjectReference Include="..\Shared\Shared.csproj" />
 		<ProjectReference Include="..\VulkanView.Maui\VulkanView.Maui.csproj" />
 	</ItemGroup>
@@ -78,6 +79,10 @@
 	    <Link>Resources\Textures\texture.jpg</Link>
 	    <IsDefaultItem>true</IsDefaultItem>
 	  </BundleResource>
+    <BundleResource Include="Resources\Raw\Textures\texture2.jpg">
+      <Link>Resources\Textures\texture2.jpg</Link>
+      <IsDefaultItem>true</IsDefaultItem>
+    </BundleResource>
 	</ItemGroup>
 
 </Project>

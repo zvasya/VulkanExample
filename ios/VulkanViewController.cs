@@ -1,6 +1,9 @@
 using CoreAnimation;
+using Examples;
 using ObjCRuntime;
 using Shared;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace ios;
 
@@ -19,6 +22,7 @@ public class VulkanViewController : UIViewController
     CADisplayLink? _displayLink;
     HelloEngine _engine;
     Surface surface;
+    Example1 _example;
 
     [Export("viewDidLoad")]
     public override void ViewDidLoad()
@@ -35,14 +39,31 @@ public class VulkanViewController : UIViewController
             return surfaceKhr;
         });
         
+        _example = new Example1(
+            surface,
+            GetVertShader,
+            GetFragShader,
+            GetImage1,
+            GetImage2
+        );
+        
         nint fps = 60;
         _displayLink = CADisplayLink.Create(RenderLoop);
         _displayLink.PreferredFramesPerSecond = fps;
         _displayLink.AddToRunLoop(NSRunLoop.Current, NSRunLoopMode.Default);
     }
 
+    static byte[] GetVertShader() => File.ReadAllBytes("Shaders/vert.spv");
+
+    static byte[] GetFragShader() => File.ReadAllBytes("Shaders/frag.spv");
+
+    static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Textures/texture.jpg");
+
+    static Image<Rgba32> GetImage2() => Image.Load<Rgba32>("Textures/texture2.jpg");
+
     void RenderLoop()
     {
+        _example.Update();
         _engine.DrawFrame();
     }
 
