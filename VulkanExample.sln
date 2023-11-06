@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VulkanView.Maui", "VulkanVi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples", "Examples\Examples.csproj", "{FCF9D14D-0568-4792-A363-CBCD779B2C59}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{FCF9D14D-0568-4792-A363-CBCD779B2C59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCF9D14D-0568-4792-A363-CBCD779B2C59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCF9D14D-0568-4792-A363-CBCD779B2C59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

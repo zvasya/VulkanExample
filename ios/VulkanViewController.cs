@@ -63,8 +63,7 @@ public class VulkanViewController : UIViewController
 
     void RenderLoop()
     {
-        _example.Update();
-        _engine.DrawFrame();
+        surface.Update();
     }
 
     public override void ViewDidLayoutSubviews()

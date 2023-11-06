@@ -53,9 +53,8 @@ public sealed class VulkanView : SurfaceView, ISurfaceHolderCallback
 
     protected override void OnDraw(Canvas? canvas)
     {
-        _example1.Update();
         base.OnDraw(canvas);
-        _surface.DrawFrame();
+        _surface.Update();
     }
 
     public void SurfaceChanged(ISurfaceHolder holder, Format format, int w, int h)

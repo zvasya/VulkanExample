@@ -26,7 +26,7 @@ public unsafe partial class Surface
         }
     }
 
-    public void DrawFrame()
+    void DrawFrame()
     {
         _inFlightFences[_currentFrame].WaitForFences(true, ulong.MaxValue);
 

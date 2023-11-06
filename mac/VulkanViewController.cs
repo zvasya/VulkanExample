@@ -57,9 +57,7 @@ public class VulkanViewController : NSViewController
     
     CVReturn Render(CVDisplayLink displayLink, ref CVTimeStamp innow, ref CVTimeStamp inoutputtime, CVOptionFlags flagsin, ref CVOptionFlags flagsout)
     {
-        _example.Update();
-        _engine.DrawFrame();
-        
+        _surface.Update();
         return CVReturn.Success;
     }
 

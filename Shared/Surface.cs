@@ -12,6 +12,10 @@ public unsafe partial class Surface : IDisposable
     SwapChainSupportDetails _swapChainSupport;
     SurfaceFormatKHR _surfaceFormat;
     Format _depthFormat;
+
+    public event Action BeforeDraw;
+
+    public Extent2D Extent2D => _swapChain.Extent;
     
     HelloRenderPass _renderPass;
     readonly List<HelloPipeline> _graphicsPipelines = new List<HelloPipeline>();
@@ -48,6 +52,12 @@ public unsafe partial class Surface : IDisposable
         CreateImageViews2();
         CreateDepthResources2();
         CreateFramebuffers2();
+    }
+
+    public void Update()
+    {
+        BeforeDraw.Invoke();
+        DrawFrame();
     }
 
     public HelloTexture CreateTexture(Image<Rgba32> img)
@@ -130,4 +140,6 @@ public unsafe partial class Surface : IDisposable
 
         _engine.DestroySurface(_surface, null);
     }
+    
+    
 }

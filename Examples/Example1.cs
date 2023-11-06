@@ -1,5 +1,8 @@
 using System.Numerics;
 using Shared;
+using Core;
+using Core.PlayerLoop;
+using Core.PlayerLoopStages;
 using Silk.NET.Maths;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -9,14 +12,14 @@ namespace Examples;
 public class Example1
 {
     readonly Surface _surface;
-    readonly CameraNode _camera;
-    readonly RendererNode _renderer1;
-    readonly RendererNode _renderer2;
-    readonly RendererNode _renderer3;
-    readonly RendererNode _renderer4;
-    readonly RendererNode _renderer5;
-
-    readonly DateTime _dateTime = DateTime.UtcNow;
+    readonly PlayerLoop _playerLoop;
+    readonly Node _camera;
+    readonly Node _cameraRoot;
+    readonly Node _renderer1;
+    readonly Node _renderer2;
+    readonly Node _renderer3;
+    readonly Node _renderer4;
+    readonly Node _renderer5;
 
     readonly Vertex[] _vertices =
     {
@@ -33,11 +36,23 @@ public class Example1
     {
         _surface = surface;
 
-        _camera = new CameraNode();
-        _surface.RegisterCamera(_camera);
-        _camera._position = new Vector3(2, 2, 2);
-        _camera._rotation = CreateFromYawPitchRoll(DegToRad(54.7f), 0, DegToRad(135f));
+        _playerLoop = CreatePlayerLoop();
+        _surface.BeforeDraw += _playerLoop.Run;
 
+        _cameraRoot = new Node("camera_root");
+        _cameraRoot.AddComponent(new CameraRotator() { Speed = 1.0f/5000.0f});
+        
+        _camera = new Node("camera");
+        var camera = new Camera(_surface)
+        {
+            // FieldOfView = 35f,
+        };
+        _camera.AddComponent(camera);
+        
+        _camera.LocalPosition = new Vector3(2, 2, 2);
+        _camera.LocalRotation = CreateFromYawPitchRoll(DegToRad(54.7f), 0, DegToRad(135f));
+
+        _cameraRoot.AddChild(_camera);
         var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription1(), Vertex.GetAttributeDescriptions1());
         HelloTexture texture;
         using (var img = image1())
@@ -54,27 +69,42 @@ public class Example1
         var vb = _surface.CreateVertexBuffer(_vertices);
         var ib = _surface.CreateIndexBuffer(_indices);
 
-        _renderer1 = _surface.CreateRenderer(pipeline, vb, ib, texture);
-        _renderer1._position = new Vector3(0, 0, 0.5f);
-        _renderer2 = _surface.CreateRenderer(pipeline, vb, ib, texture2);
-        _renderer2._position = Vector3.Zero;
-        _renderer3 = _surface.CreateRenderer(pipeline, vb, ib, texture);
-        _renderer3._position = new Vector3(0, 0, -0.5f);
-        ;
-        _renderer4 = _surface.CreateRenderer(pipeline, vb, ib, texture2);
-        _renderer4._position = new Vector3(0, 0, 1.0f);
-        _renderer5 = _surface.CreateRenderer(pipeline, vb, ib, texture);
-        _renderer5._position = new Vector3(0, 0, -1.0f);
+        _renderer1 = new Node("renderer1");
+        var renderer1 = new Renderer(_surface,pipeline, vb, ib, texture);
+        _renderer1.AddComponent(renderer1);
+        _renderer1.LocalPosition = new Vector3(0, 0, 0.5f);
+        _renderer1.AddComponent(new TwistRotator {Speed = 1.0f/40f});
+        
+        _renderer2 = new Node("renderer2");
+        var renderer2 = new Renderer(_surface, pipeline, vb, ib, texture);
+        _renderer2.AddComponent(renderer2);
+        _renderer2.LocalPosition = Vector3.Zero;
+        _renderer2.AddComponent(new TwistRotator {Speed = 1.0f/30f});
+        
+        _renderer3 = new Node("renderer3");
+        var renderer3 = new Renderer(_surface, pipeline, vb, ib, texture);
+        _renderer3.AddComponent(renderer3);
+        _renderer3.LocalPosition = new Vector3(0, 0, -0.5f);
+        _renderer3.AddComponent(new TwistRotator {Speed = 1.0f/20f});
+        
+        _renderer4 = new Node("renderer4");
+        var renderer4 = new Renderer(_surface, pipeline, vb, ib, texture2);
+        _renderer4.AddComponent(renderer4);
+        _renderer4.LocalPosition = new Vector3(0, 0, 1.0f);
+        _renderer1.AddComponent(new TwistRotator {Speed = 1.0f/50f});
+        
+        _renderer5 = new Node("renderer5");
+        var renderer5 = new Renderer(_surface, pipeline, vb, ib, texture);
+        _renderer5.AddComponent(renderer5);
+        _renderer5.LocalPosition = new Vector3(0, 0, -1.0f);
+        _renderer5.AddComponent(new TwistRotator {Speed = 1.0f/50f});
     }
 
-    public void Update()
+    static PlayerLoop CreatePlayerLoop()
     {
-        var time = (DateTime.UtcNow - _dateTime).TotalMilliseconds / 10f;
-
-        _renderer1._rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.Sin(Scalar.DegreesToRadians(time) / 4));
-        _renderer2._rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.Sin(Scalar.DegreesToRadians(time) / 3));
-        _renderer3._rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.Sin(Scalar.DegreesToRadians(time) / 2));
-        _renderer4._rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.Sin(Scalar.DegreesToRadians(time) / 5));
-        _renderer5._rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.Sin(Scalar.DegreesToRadians(time) / 1));
+        var playerLoop = new PlayerLoop();
+        playerLoop.Add(new UpdateStage());
+        playerLoop.Add(new RenderableStage());
+        return playerLoop;
     }
 }

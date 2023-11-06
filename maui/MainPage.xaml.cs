@@ -62,8 +62,7 @@ public partial class MainPage : ContentPage
 
     void vulkanView_DrawFrame(object sender, EventArgs e)
     {
-        _example.Update();
-        _surface.DrawFrame();
+        _surface.Update();
     }
 
     void vulkanView_OnChangeSize(object sender, ChangeSizeEventArgs e)

@@ -197,12 +197,4 @@ public unsafe partial class HelloEngine : IDisposable
 
         return null;
     }
-
-    public void DrawFrame()
-    {
-        foreach (var surface in _surfaces)
-        {
-            surface.DrawFrame();
-        }
-    }
 }

@@ -5,7 +5,7 @@ using Silk.NET.Vulkan;
 
 namespace Shared;
 
-public unsafe class RendererNode : Node, IDisposable
+public unsafe class RendererNode : IDisposable
 {
     readonly LogicalDevice _device;
 
@@ -16,6 +16,8 @@ public unsafe class RendererNode : Node, IDisposable
     UniformBuffer _uniformBuffers;
     readonly HelloIndexBuffer _indexBuffer;
     readonly HelloVertexBuffer _vertexBuffer;
+
+    public Matrix4x4 WorldMatrix4X4 { get; set; }
 
     RendererNode(LogicalDevice device, HelloPipeline pipeline, HelloTexture texture, HelloIndexBuffer indexBuffer, HelloVertexBuffer vertexBuffer)
     {
@@ -70,9 +72,9 @@ public unsafe class RendererNode : Node, IDisposable
         };
         UniformBufferObject ubo = new()
         {
-            _model = TRS().ToGeneric(),
-            _view = camera.View().ToGeneric(),
-            _proj = camera.Projection((float)swapChain.Extent.Width / swapChain.Extent.Height).ToGeneric(),
+            _model = WorldMatrix4X4.ToGeneric(),
+            _view = camera.ViewMatrix,
+            _proj = camera.Projection,
         };
         ubo._proj.M22 *= -1;
 
