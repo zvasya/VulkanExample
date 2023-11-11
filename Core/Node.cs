@@ -57,7 +57,7 @@ public class Node : IDisposable
 
     }
 
-    Vector3 LocalScale
+    public Vector3 LocalScale
     {
         get => _localScale;
         set
@@ -211,6 +211,24 @@ public class Node : IDisposable
         OnNestedChildNodeRemoved(node, removed);
     }
 
+    public bool TryFindChildByPath(string path, out Node? node)
+    {
+        var pathParts = path.Split("/");
+        node = this;
+        
+        if (path == "")
+            return true;
+        
+        foreach (var part in pathParts)
+        {
+            node = node.Children.FirstOrDefault(child => child.Name == part);
+            if (node == null)
+                return false;
+        }
+
+        return true;
+    }
+
     public void Dispose()
     {
         foreach (var child in Children) 
@@ -222,4 +240,33 @@ public class Node : IDisposable
         
         _parent?.RemoveChild(this);
     }
+
+    public Action<float> GetSetterAnim(string property)
+    {
+        return property switch
+        {
+            "localPosition.x" => SetLocalPositionX,
+            "localPosition.y" => SetLocalPositionY,
+            "localPosition.z" => SetLocalPositionZ,
+            "localRotation.x" => SetLocalRotationX,
+            "localRotation.y" => SetLocalRotationY,
+            "localRotation.z" => SetLocalRotationZ,
+            "localRotation.w" => SetLocalRotationW,
+            "localScale.x" => SetLocalScaleX,
+            "localScale.y" => SetLocalScaleY,
+            "localScale.z" => SetLocalScaleZ,
+            _ => throw new Exception($"Binding property {property} not supported")
+        };
+    }
+
+    public void SetLocalPositionX(float x) => LocalPosition = LocalPosition with { X = x };
+    public void SetLocalPositionY(float y) => LocalPosition = LocalPosition with { Y = y };
+    public void SetLocalPositionZ(float z) => LocalPosition = LocalPosition with { Z = z };
+    public void SetLocalRotationX(float x) => LocalRotation = LocalRotation with { X = x };
+    public void SetLocalRotationY(float y) => LocalRotation = LocalRotation with { Y = y };
+    public void SetLocalRotationZ(float z) => LocalRotation = LocalRotation with { Z = z };
+    public void SetLocalRotationW(float w) => LocalRotation = LocalRotation with { W = w };
+    public void SetLocalScaleX(float x) => LocalScale = LocalScale with { X = x };
+    public void SetLocalScaleY(float y) => LocalScale = LocalScale with { Y = y };
+    public void SetLocalScaleZ(float z) => LocalScale = LocalScale with { Z = z };
 }

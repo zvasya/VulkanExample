@@ -38,21 +38,7 @@ public class Example1
 
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
-
-        _cameraRoot = new Node("camera_root");
-        _cameraRoot.AddComponent(new CameraRotator() { Speed = 1.0f/5000.0f});
         
-        _camera = new Node("camera");
-        var camera = new Camera(_surface)
-        {
-            // FieldOfView = 35f,
-        };
-        _camera.AddComponent(camera);
-        
-        _camera.LocalPosition = new Vector3(2, 2, 2);
-        _camera.LocalRotation = CreateFromYawPitchRoll(DegToRad(54.7f), 0, DegToRad(135f));
-
-        _cameraRoot.AddChild(_camera);
         var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription1(), Vertex.GetAttributeDescriptions1());
         HelloTexture texture;
         using (var img = image1())
@@ -69,6 +55,18 @@ public class Example1
         var vb = _surface.CreateVertexBuffer(_vertices);
         var ib = _surface.CreateIndexBuffer(_indices);
 
+        _cameraRoot = new Node("camera_root");
+        _cameraRoot.AddComponent(new CameraRotator() { Speed = 1.0f/5000.0f});
+        
+        _camera = new Node("camera");
+        var camera = new Camera(_surface);
+        _camera.AddComponent(camera);
+        
+        _camera.LocalPosition = new Vector3(2, 2, 2);
+        _camera.LocalRotation = CreateFromYawPitchRoll(DegToRad(54.7f), 0, DegToRad(135f));
+
+        _cameraRoot.AddChild(_camera);
+        
         _renderer1 = new Node("renderer1");
         var renderer1 = new Renderer(_surface,pipeline, vb, ib, texture);
         _renderer1.AddComponent(renderer1);

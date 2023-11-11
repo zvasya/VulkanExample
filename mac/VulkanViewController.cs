@@ -13,6 +13,7 @@ public class VulkanViewController : NSViewController
     HelloEngine _engine;
     Surface _surface;
     Example1 _example;
+    CVDisplayLink? _displayLink;
 	protected VulkanViewController (NativeHandle handle) : base (handle)
 	{
 		// This constructor is required if the view controller is loaded from a xib or a storyboard.
@@ -42,9 +43,10 @@ public class VulkanViewController : NSViewController
             );
         
         nint fps = 60;
-        var displayLink = CVDisplayLink.CreateFromDisplayId((uint) CGDisplay.MainDisplayID);
-        displayLink?.SetOutputCallback(Render);
-        displayLink?.Start();
+        
+        _displayLink = CVDisplayLink.CreateFromDisplayId((uint) CGDisplay.MainDisplayID);
+        _displayLink?.SetOutputCallback(Render);
+        _displayLink?.Start();
     }
 
     static byte[] GetVertShader() => File.ReadAllBytes("Contents/Resources/Shaders/vert.spv");
