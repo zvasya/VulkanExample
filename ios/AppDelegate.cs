@@ -1,15 +1,12 @@
-﻿namespace ios;
+namespace ios;
 
-[Register ("AppDelegate")]
-public class AppDelegate : UIApplicationDelegate {
-	public override UIWindow? Window {
-		get;
-		set;
-	}
+[Register("AppDelegate")]
+public class AppDelegate : UIApplicationDelegate
+{
+    public override UIWindow? Window { get; set; }
 
-	public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
-	{
-		return true;
-	}
+    public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
+    {
+        return true;
+    }
 }
-

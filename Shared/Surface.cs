@@ -9,6 +9,7 @@ public unsafe partial class Surface : IDisposable
     readonly SurfaceKHR _surface;
 
     LogicalDevice _device;
+    readonly bool _yInversion;
     SwapChainSupportDetails _swapChainSupport;
     SurfaceFormatKHR _surfaceFormat;
     Format _depthFormat;
@@ -20,15 +21,16 @@ public unsafe partial class Surface : IDisposable
     HelloRenderPass _renderPass;
     readonly List<HelloPipeline> _graphicsPipelines = new List<HelloPipeline>();
 
-    Surface(HelloEngine engine, Func<SurfaceKHR> createSurface)
+    Surface(HelloEngine engine, Func<SurfaceKHR> createSurface, bool yInversion)
     {
         _engine = engine;
+        _yInversion = yInversion;
         _surface = createSurface();
     }
 
-    public static Surface Create(HelloEngine engine, Func<SurfaceKHR> createSurface)
+    public static Surface Create(HelloEngine engine, Func<SurfaceKHR> createSurface, bool yInversion = false)
     {
-        var surface = new Surface(engine, createSurface);
+        var surface = new Surface(engine, createSurface, yInversion);
         surface.Init();
         return surface;
     }
@@ -74,9 +76,13 @@ public unsafe partial class Surface : IDisposable
         return pipeline;
     }
 
-    public HelloIndexBuffer CreateIndexBuffer(ushort[] indices)
+    public HelloIndexBuffer CreateIndexBuffer(ushort[] indices) => CreateIndexBufferInternal(indices, IndexType.Uint16);
+    public HelloIndexBuffer CreateIndexBuffer(uint[] indices) => CreateIndexBufferInternal(indices, IndexType.Uint32);
+    
+    HelloIndexBuffer CreateIndexBufferInternal<T>(T[] indices, IndexType indexType) where T : struct
     {
-        var indexBuffer = HelloIndexBuffer.Create(_device, (uint)indices.Length);
+        var size = (ulong)(Unsafe.SizeOf<T>() * indices.Length);
+        var indexBuffer = HelloIndexBuffer.Create(_device, size, (uint)indices.Length, indexType);
         indexBuffer.FillStaging(indices, _device.CommandPool, _device.GraphicsQueue);
         return indexBuffer;
     }

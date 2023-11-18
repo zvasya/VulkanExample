@@ -7,6 +7,7 @@ namespace Examples;
 public class CameraRotator : Component, IUpdateble
 {
     public required float Speed { get; set; }
+    public required Vector3 Axis { get; set; }
     
     protected override void OnConnect()
     {
@@ -22,6 +23,6 @@ public class CameraRotator : Component, IUpdateble
 
     public void Update(double time)
     {
-        SceneNode!.LocalRotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float) (time * Speed) );
+        SceneNode!.LocalRotation = Quaternion.CreateFromAxisAngle(Axis, (float) (time * Speed) );
     }
 }

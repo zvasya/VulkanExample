@@ -1,20 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Example1</RootNamespace>
+        <RootNamespace>Examples</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Silk.NET.Maths" Version="2.18.0" />
-      <PackageReference Include="Silk.NET.Vulkan" Version="2.18.0" />
+        <PackageReference Include="glTF2Loader" Version="1.1.4-alpha" />
+        <PackageReference Include="Silk.NET.Maths" Version="2.18.0" />
+        <PackageReference Include="Silk.NET.Vulkan" Version="2.18.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Shared\Shared.csproj" />
-      <ProjectReference Include="..\Core\Core.csproj" />
+        <ProjectReference Include="..\Shared\Shared.csproj" />
+        <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
-
+    
 </Project>

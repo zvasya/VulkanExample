@@ -8,4 +8,3 @@ namespace maui;
 public class MainActivity : MauiAppCompatActivity
 {
 }
-

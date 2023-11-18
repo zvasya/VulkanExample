@@ -11,7 +11,7 @@ internal struct Vertex
     public Vector3D<float> _color;
     public Vector2D<float> _texCoord;
 
-    public static VertexInputBindingDescription GetBindingDescription1()
+    public static VertexInputBindingDescription GetBindingDescription()
     {
         VertexInputBindingDescription bindingDescription = new()
         {
@@ -23,7 +23,7 @@ internal struct Vertex
         return bindingDescription;
     }
 
-    public static VertexInputAttributeDescription[] GetAttributeDescriptions1()
+    public static VertexInputAttributeDescription[] GetAttributeDescriptions()
     {
         var attributeDescriptions = new[]
         {

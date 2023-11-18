@@ -8,20 +8,22 @@ public class HelloIndexBuffer : HelloBuffer
 {
     public uint IndicesCount { get; }
 
-    public void BindIndexBuffer(HelloCommandBuffer commandBuffer, IndexType indexType = IndexType.Uint16)
+    public IndexType IndexType { get; }
+
+    public void BindIndexBuffer(HelloCommandBuffer commandBuffer)
     {
-        commandBuffer.CmdBindIndexBuffer(Buffer, 0, indexType);
+        commandBuffer.CmdBindIndexBuffer(Buffer, 0, IndexType);
     }
     
-    public static HelloIndexBuffer Create(LogicalDevice device, uint indicesCount)
+    public static HelloIndexBuffer Create(LogicalDevice device, ulong bufferSize, uint indicesCount, IndexType indexType)
     {
-        var size = (ulong)(Unsafe.SizeOf<ushort>() * indicesCount);
-        device.CreateBuffer(size, BufferUsageFlags.TransferDstBit | BufferUsageFlags.IndexBufferBit, MemoryPropertyFlags.DeviceLocalBit, out var buffer, out var bufferMemory);
-        return new HelloIndexBuffer(device, size, indicesCount, buffer, bufferMemory);
+        device.CreateBuffer(bufferSize, BufferUsageFlags.TransferDstBit | BufferUsageFlags.IndexBufferBit, MemoryPropertyFlags.DeviceLocalBit, out var buffer, out var bufferMemory);
+        return new HelloIndexBuffer(device, bufferSize, indicesCount, indexType, buffer, bufferMemory);
     }
 
-    HelloIndexBuffer(LogicalDevice device, ulong bufferSize, uint indicesCount, Buffer buffer, DeviceMemory bufferMemory) : base(device, bufferSize, buffer, bufferMemory)
+    HelloIndexBuffer(LogicalDevice device, ulong bufferSize, uint indicesCount, IndexType indexType, Buffer buffer, DeviceMemory bufferMemory) : base(device, bufferSize, buffer, bufferMemory)
     {
         IndicesCount = indicesCount;
+        IndexType = indexType;
     }
 }

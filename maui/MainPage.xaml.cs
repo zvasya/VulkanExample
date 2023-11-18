@@ -14,15 +14,15 @@ public partial class MainPage : ContentPage
     Surface _surface;
     Example1 _example;
 
-	public MainPage()
-	{
-		InitializeComponent();
+    public MainPage()
+    {
+        InitializeComponent();
     }
 
     void OnCounterClicked(object sender, EventArgs e)
-	{
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+    {
+        SemanticScreenReader.Announce(CounterBtn.Text);
+    }
 
     void vulkanView_ViewCreated(object sender, EventArgs e)
     {
@@ -31,7 +31,7 @@ public partial class MainPage : ContentPage
         _surface = _engine.CreateSurface(() => v.CreateSurface(_engine));
         _example = new Example1(_surface, GetVertShader, GetFragShader, GetImage1, GetImage2);
     }
-    
+
     static byte[] GetVertShader() => Read("Shaders/vert.spv");
     static byte[] GetFragShader() => Read("Shaders/frag.spv");
 
@@ -40,13 +40,13 @@ public partial class MainPage : ContentPage
         using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture.jpg");
         return Image.Load<Rgba32>(stream.Result);
     }
-    
+
     static Image<Rgba32> GetImage2()
     {
         using var stream = FileSystem.OpenAppPackageFileAsync("Textures/texture2.jpg");
         return Image.Load<Rgba32>(stream.Result);
     }
-    
+
     static byte[] Read(string fileName)
     {
         using var stream = FileSystem.OpenAppPackageFileAsync(fileName);
@@ -70,5 +70,3 @@ public partial class MainPage : ContentPage
         _surface?.ChangeSize();
     }
 }
-
-

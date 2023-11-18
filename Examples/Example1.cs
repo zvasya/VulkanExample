@@ -39,7 +39,7 @@ public class Example1
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
         
-        var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription1(), Vertex.GetAttributeDescriptions1());
+        var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
         HelloTexture texture;
         using (var img = image1())
         {
@@ -56,7 +56,7 @@ public class Example1
         var ib = _surface.CreateIndexBuffer(_indices);
 
         _cameraRoot = new Node("camera_root");
-        _cameraRoot.AddComponent(new CameraRotator() { Speed = 1.0f/5000.0f});
+        _cameraRoot.AddComponent(new CameraRotator() { Speed = 1.0f/5000.0f, Axis = Vector3.UnitZ});
         
         _camera = new Node("camera");
         var camera = new Camera(_surface);

@@ -602,7 +602,7 @@ public class Example2
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
 
-        var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription1(), Vertex.GetAttributeDescriptions1());
+        var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
         HelloTexture texture;
         using (var img = image1())
         {

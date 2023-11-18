@@ -113,7 +113,8 @@ public unsafe class HelloPipeline : IDisposable
                 PolygonMode = PolygonMode.Fill,
                 LineWidth = 1.0f,
                 CullMode = CullModeFlags.BackBit,
-                FrontFace = FrontFace.Clockwise,
+                // FrontFace = FrontFace.Clockwise,
+                FrontFace = FrontFace.CounterClockwise,
                 DepthBiasEnable = false,
                 DepthBiasConstantFactor = 0.0f, // Optional
                 DepthBiasClamp = 0.0f, // Optional

@@ -12,7 +12,7 @@ public class VulkanViewController : NSViewController
 {
     HelloEngine _engine;
     Surface _surface;
-    Example1 _example;
+    object _example;
     CVDisplayLink? _displayLink;
 	protected VulkanViewController (NativeHandle handle) : base (handle)
 	{
@@ -32,14 +32,15 @@ public class VulkanViewController : NSViewController
         {
             HelloEngine.CreateMetalSurface(_engine, View.Layer.GetHandle(), out var surfaceKhr);
             return surfaceKhr;
-        });
+        },
+            true);
 
-        _example = new Example1(
+        _example = new Example3(
             _surface,
             GetVertShader,
             GetFragShader,
             GetImage1,
-            GetImage2
+            () => File.OpenRead("Contents/Resources/Models/deer.gltf")
             );
         
         nint fps = 60;
@@ -49,11 +50,14 @@ public class VulkanViewController : NSViewController
         _displayLink?.Start();
     }
 
+    // static byte[] GetVertShader() => File.ReadAllBytes("Contents/Resources/Shaders/gltfloading/mesh.vert.spv");
     static byte[] GetVertShader() => File.ReadAllBytes("Contents/Resources/Shaders/vert.spv");
 
+    // static byte[] GetFragShader() => File.ReadAllBytes("Contents/Resources/Shaders/gltfloading/mesh.frag.spv");
     static byte[] GetFragShader() => File.ReadAllBytes("Contents/Resources/Shaders/frag.spv");
 
-    static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Contents/Resources/Textures/texture.jpg");
+    static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Contents/Resources/Textures/grey.png");
+    // static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Contents/Resources/Textures/texture.jpg");
 
     static Image<Rgba32> GetImage2() => Image.Load<Rgba32>("Contents/Resources/Textures/texture2.jpg");
     

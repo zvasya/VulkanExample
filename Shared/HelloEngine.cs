@@ -83,9 +83,9 @@ public unsafe partial class HelloEngine : IDisposable
         Helpers.CheckErrors(khrAndroidSurface.CreateAndroidSurface(engine._instance, &createInfo, null, out surface));
     }
 
-    public Surface CreateSurface(Func<SurfaceKHR> factory)
+    public Surface CreateSurface(Func<SurfaceKHR> factory, bool yInversion = false)
     {
-        var surface = Surface.Create(this, factory);
+        var surface = Surface.Create(this, factory,yInversion);
         _surfaces.Add(surface);
         return surface;
     }
@@ -125,7 +125,10 @@ public unsafe partial class HelloEngine : IDisposable
             VK.EnumerateInstanceExtensionProperties((string)null!, &availableExtensionCount, instanceExtensionPtr);
         }
 
-        var availableExtension = availableExtensionProperties.Select(property => SilkMarshal.PtrToString(new IntPtr(property.ExtensionName), NativeStringEncoding.LPTStr)).ToArray();
+        var availableExtension = availableExtensionProperties.Select(property =>
+        {
+            return SilkMarshal.PtrToString(new IntPtr(property.ExtensionName), NativeStringEncoding.LPTStr);
+        }).ToArray();
 
         var extensions = platform.InstanceExtensions;
         var requestedExtension = extensions.Concat(instanceExtensions).Intersect(availableExtension).ToArray();
@@ -186,7 +189,10 @@ public unsafe partial class HelloEngine : IDisposable
             VK.EnumerateInstanceLayerProperties(&layerCount, availableLayersPtr);
         }
 
-        var availableLayerNames = availableLayers.Select(availableLayer => Marshal.PtrToStringAnsi((nint)availableLayer.LayerName)).ToArray();
+        var availableLayerNames = availableLayers.Select(availableLayer =>
+        {
+            return Marshal.PtrToStringAnsi((nint)availableLayer.LayerName);
+        }).ToArray();
         foreach (var validationLayerNameSet in validationLayerNamesPriorityList)
         {
             if (validationLayerNameSet.All(validationLayerName => availableLayerNames.Contains(validationLayerName)))
