@@ -22,4 +22,9 @@
         <ProjectReference Include="..\Examples\Examples.csproj" />
         <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="..\Assets\**\*.*">
+        <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      </Content>
+    </ItemGroup>
 </Project>

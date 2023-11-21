@@ -81,22 +81,7 @@
         <ProjectReference Include="..\VulkanView.Maui\VulkanView.Maui.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <BundleResource Include="Resources\Raw\Shaders\frag.spv">
-            <Link>Resources\Shaders\frag.spv</Link>
-            <IsDefaultItem>true</IsDefaultItem>
-        </BundleResource>
-        <BundleResource Include="Resources\Raw\Shaders\vert.spv">
-            <Link>Resources\Shaders\vert.spv</Link>
-            <IsDefaultItem>true</IsDefaultItem>
-        </BundleResource>
-        <BundleResource Include="Resources\Raw\Textures\texture.jpg">
-            <Link>Resources\Textures\texture.jpg</Link>
-            <IsDefaultItem>true</IsDefaultItem>
-        </BundleResource>
-        <BundleResource Include="Resources\Raw\Textures\texture2.jpg">
-            <Link>Resources\Textures\texture2.jpg</Link>
-            <IsDefaultItem>true</IsDefaultItem>
-        </BundleResource>
+        <MauiAsset Include="..\Assets\**\*.*" LogicalName="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
 </Project>

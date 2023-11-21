@@ -32,22 +32,22 @@ public class Example1
     readonly ushort[] _indices = { 0, 1, 2, 2, 3, 0 };
 
 
-    public Example1(Surface surface, Func<byte[]> vertexShader, Func<byte[]> fragmentShader, Func<Image<Rgba32>> image1, Func<Image<Rgba32>> image2)
+    public Example1(Surface surface, Func<string, Stream> assetLoader)
     {
         _surface = surface;
 
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
         
-        var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
+        var pipeline = _surface.CreatePipeLine(GetVertexShader(assetLoader), GetFragmentShader(assetLoader), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
         HelloTexture texture;
-        using (var img = image1())
+        using (var img = GetImage(assetLoader, "Textures/texture.jpg"))
         {
             texture = _surface.CreateTexture(img);
         }
 
         HelloTexture texture2;
-        using (var img = image2())
+        using (var img = GetImage(assetLoader, "Textures/texture2.jpg"))
         {
             texture2 = _surface.CreateTexture(img);
         }
@@ -96,6 +96,23 @@ public class Example1
         _renderer5.AddComponent(renderer5);
         _renderer5.LocalPosition = new Vector3(0, 0, -1.0f);
         _renderer5.AddComponent(new TwistRotator {Speed = 1.0f/50f});
+    }
+
+    byte[] GetFragmentShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/frag.spv");
+    byte[] GetVertexShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/vert.spv");
+
+    Image<Rgba32> GetImage(Func<string, Stream> assetLoader, string path)
+    {
+        using var stream = assetLoader(path);
+        return Image.Load<Rgba32>(stream);
+    }
+
+    byte[] GetBytes(Func<string, Stream> assetLoader, string path)
+    {
+        using var stream = assetLoader(path);
+        using var memStream = new MemoryStream();
+        stream.CopyTo(memStream);
+        return memStream.ToArray();
     }
 
     static PlayerLoop CreatePlayerLoop()

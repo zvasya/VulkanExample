@@ -9,7 +9,6 @@ public unsafe partial class Surface : IDisposable
     readonly SurfaceKHR _surface;
 
     LogicalDevice _device;
-    readonly bool _yInversion;
     SwapChainSupportDetails _swapChainSupport;
     SurfaceFormatKHR _surfaceFormat;
     Format _depthFormat;
@@ -21,16 +20,15 @@ public unsafe partial class Surface : IDisposable
     HelloRenderPass _renderPass;
     readonly List<HelloPipeline> _graphicsPipelines = new List<HelloPipeline>();
 
-    Surface(HelloEngine engine, Func<SurfaceKHR> createSurface, bool yInversion)
+    Surface(HelloEngine engine, Func<SurfaceKHR> createSurface)
     {
         _engine = engine;
-        _yInversion = yInversion;
         _surface = createSurface();
     }
 
-    public static Surface Create(HelloEngine engine, Func<SurfaceKHR> createSurface, bool yInversion = false)
+    public static Surface Create(HelloEngine engine, Func<SurfaceKHR> createSurface)
     {
-        var surface = new Surface(engine, createSurface, yInversion);
+        var surface = new Surface(engine, createSurface);
         surface.Init();
         return surface;
     }

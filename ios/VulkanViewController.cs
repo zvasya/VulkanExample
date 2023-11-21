@@ -22,7 +22,7 @@ public class VulkanViewController : UIViewController
     CADisplayLink? _displayLink;
     HelloEngine _engine;
     Surface surface;
-    Example1 _example;
+    object _example;
 
     [Export("viewDidLoad")]
     public override void ViewDidLoad()
@@ -39,12 +39,9 @@ public class VulkanViewController : UIViewController
             return surfaceKhr;
         });
         
-        _example = new Example1(
+        _example = new Example3(
             surface,
-            GetVertShader,
-            GetFragShader,
-            GetImage1,
-            GetImage2
+            Load
         );
         
         nint fps = 60;
@@ -53,14 +50,11 @@ public class VulkanViewController : UIViewController
         _displayLink.AddToRunLoop(NSRunLoop.Current, NSRunLoopMode.Default);
     }
 
-    static byte[] GetVertShader() => File.ReadAllBytes("Shaders/vert.spv");
-
-    static byte[] GetFragShader() => File.ReadAllBytes("Shaders/frag.spv");
-
-    static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Textures/texture.jpg");
-
-    static Image<Rgba32> GetImage2() => Image.Load<Rgba32>("Textures/texture2.jpg");
-
+    static Stream Load(string path)
+    {
+        return File.OpenRead(path);
+    }
+    
     void RenderLoop()
     {
         surface.Update();

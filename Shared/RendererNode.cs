@@ -61,7 +61,7 @@ public unsafe class RendererNode : IDisposable
         _descriptorSet = _uniformBuffers.CreateDescriptorSets(descriptorPool, _pipeline.DescriptorSetLayout, _texture.ImageView, _texture.Sampler);
     }
 
-    public void UpdateUniformBuffer(uint currentImage, HelloSwapchain swapChain, CameraNode camera, bool yInversion)
+    public void UpdateUniformBuffer(uint currentImage, HelloSwapchain swapChain, CameraNode camera)
     {
         var preRotation = swapChain.PreTransform switch
         {
@@ -76,8 +76,6 @@ public unsafe class RendererNode : IDisposable
             _view = camera.ViewMatrix,
             _proj = camera.Projection,
         };
-        // if (!yInversion)
-        //     ubo._proj.M22 *= -1;
 
         _uniformBuffers[currentImage].Fill(ubo);
     }

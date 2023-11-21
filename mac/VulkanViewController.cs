@@ -32,15 +32,11 @@ public class VulkanViewController : NSViewController
         {
             HelloEngine.CreateMetalSurface(_engine, View.Layer.GetHandle(), out var surfaceKhr);
             return surfaceKhr;
-        },
-            true);
+        });
 
         _example = new Example3(
             _surface,
-            GetVertShader,
-            GetFragShader,
-            GetImage1,
-            () => File.OpenRead("Contents/Resources/Models/deer.gltf")
+            Load
             );
         
         nint fps = 60;
@@ -49,17 +45,11 @@ public class VulkanViewController : NSViewController
         _displayLink?.SetOutputCallback(Render);
         _displayLink?.Start();
     }
-
-    // static byte[] GetVertShader() => File.ReadAllBytes("Contents/Resources/Shaders/gltfloading/mesh.vert.spv");
-    static byte[] GetVertShader() => File.ReadAllBytes("Contents/Resources/Shaders/vert.spv");
-
-    // static byte[] GetFragShader() => File.ReadAllBytes("Contents/Resources/Shaders/gltfloading/mesh.frag.spv");
-    static byte[] GetFragShader() => File.ReadAllBytes("Contents/Resources/Shaders/frag.spv");
-
-    static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Contents/Resources/Textures/grey.png");
-    // static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Contents/Resources/Textures/texture.jpg");
-
-    static Image<Rgba32> GetImage2() => Image.Load<Rgba32>("Contents/Resources/Textures/texture2.jpg");
+    
+    static Stream Load(string path)
+    {
+	    return File.OpenRead(Path.Combine("Contents", "Resources", path));
+    }
     
     CVReturn Render(CVDisplayLink displayLink, ref CVTimeStamp innow, ref CVTimeStamp inoutputtime, CVOptionFlags flagsin, ref CVOptionFlags flagsout)
     {

@@ -23,7 +23,7 @@ public class VulkanViewController : UIViewController
     CADisplayLink? _displayLink;
     HelloEngine _engine;
     Surface _surface;
-    Example1 _example1; 
+    object _example; 
 
     [Export("viewDidLoad")]
     public override void ViewDidLoad()
@@ -39,19 +39,19 @@ public class VulkanViewController : UIViewController
             HelloEngine.CreateMetalSurface(_engine, View.Layer.GetHandle(), out var surfaceKhr);
             return surfaceKhr;
         });
-        _example1 = new Example1(_surface, GetVertShader, GetFragShader, GetImage1, GetImage2);
+        _example = new Example3(_surface, Load);
         
         nint fps = 60;
         _displayLink = CADisplayLink.Create(RenderLoop);
         _displayLink.PreferredFramesPerSecond = fps;
         _displayLink.AddToRunLoop(NSRunLoop.Current, NSRunLoopMode.Default);
     }
-    
-    static byte[] GetVertShader() => File.ReadAllBytes("Contents/Resources/Shaders/vert.spv");
-    static byte[] GetFragShader() => File.ReadAllBytes("Contents/Resources/Shaders/frag.spv");
-    static Image<Rgba32> GetImage1() => Image.Load<Rgba32>("Contents/Resources/Textures/texture.jpg");
-    static Image<Rgba32> GetImage2() => Image.Load<Rgba32>("Contents/Resources/Textures/texture2.jpg");
 
+    static Stream Load(string path)
+    {
+        return File.OpenRead(Path.Combine("Contents", "Resources", path));
+    }
+    
     void RenderLoop()
     {
         _surface.Update();

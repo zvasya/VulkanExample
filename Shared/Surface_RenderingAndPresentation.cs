@@ -45,7 +45,7 @@ public unsafe partial class Surface
 
         foreach (var rendererNode in _renderer)
         {
-            rendererNode.UpdateUniformBuffer(_currentFrame, _swapChain, _camera, _yInversion);
+            rendererNode.UpdateUniformBuffer(_currentFrame, _swapChain, _camera);
         }
         
         _inFlightFences[_currentFrame].ResetFences();
@@ -121,25 +121,16 @@ public unsafe partial class Surface
 
         // Pass
 
-        var viewport = _yInversion
-                ? new Viewport
-                {
-                    X = 0.0f,
-                    Y = _swapChain.Extent.Height,
-                    Width = _swapChain.Extent.Width,
-                    Height = -_swapChain.Extent.Height,
-                    MinDepth = 0.0f,
-                    MaxDepth = 1.0f,
-                }
-                : new Viewport
-                {
-                    X = 0.0f,
-                    Y = 0.0f,
-                    Width = _swapChain.Extent.Width,
-                    Height = _swapChain.Extent.Height,
-                    MinDepth = 0.0f,
-                    MaxDepth = 1.0f,
-                };
+        var viewport =
+            new Viewport
+            {
+                X = 0.0f,
+                Y = _swapChain.Extent.Height,
+                Width = _swapChain.Extent.Width,
+                Height = -_swapChain.Extent.Height,
+                MinDepth = 0.0f,
+                MaxDepth = 1.0f,
+            };
 
         var scissor = new Rect2D
         {

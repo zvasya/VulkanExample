@@ -595,16 +595,16 @@ public class Example2
     };
 
 
-    public Example2(Surface surface, Func<byte[]> vertexShader, Func<byte[]> fragmentShader, Func<Image<Rgba32>> image1, Func<Image<Rgba32>> image2)
+    public Example2(Surface surface, Func<string, Stream> assetLoader)
     {
         _surface = surface;
 
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
 
-        var pipeline = _surface.CreatePipeLine(vertexShader(), fragmentShader(), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
+        var pipeline = _surface.CreatePipeLine(GetVertexShader(assetLoader), GetFragmentShader(assetLoader), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
         HelloTexture texture;
-        using (var img = image1())
+        using (var img = GetImage(assetLoader, "Textures/grey.png"))
         {
             texture = _surface.CreateTexture(img);
         }
@@ -642,6 +642,23 @@ public class Example2
 
         renderer3.AddComponent(new SimpleAnimator() { Animation = CreateAnimation(CreateEasingInAnimationCurve()), Mode = SimpleAnimator.PlayMode.PING_PONG });
         _renderers.Add(renderer3);
+    }
+    
+    byte[] GetFragmentShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/frag.spv");
+    byte[] GetVertexShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/vert.spv");
+
+    Image<Rgba32> GetImage(Func<string, Stream> assetLoader, string path)
+    {
+        using var stream = assetLoader(path);
+        return Image.Load<Rgba32>(stream);
+    }
+
+    byte[] GetBytes(Func<string, Stream> assetLoader, string path)
+    {
+        using var stream = assetLoader(path);
+        using var memStream = new MemoryStream();
+        stream.CopyTo(memStream);
+        return memStream.ToArray();
     }
 
     static Curve CreateLinearAnimationCurve()

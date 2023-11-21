@@ -13,6 +13,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using Camera = Core.Camera;
 using Node = Core.Node;
 using glTFNode = glTFLoader.Schema.Node;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace Examples;
 
@@ -335,8 +336,16 @@ public class Example3
     //FlightHelmet.gltf
     void LoadGlTFFile(Stream stream)
     {
-        var file = Interface.LoadModel(stream);
-        
+        Gltf file;
+        if (!stream.CanSeek)
+        {
+            using var memStream = new MemoryStream();
+            stream.CopyTo(memStream);
+            file = Interface.LoadModel(memStream);
+        }
+        else
+            file = Interface.LoadModel(stream);
+
         // LoadImages(file);
         // LoadMaterials(file);
         // LoadTextures(file);
@@ -350,22 +359,22 @@ public class Example3
 
     }
 
-    public Example3(Surface surface, Func<byte[]> vertexShader, Func<byte[]> fragmentShader, Func<Image<Rgba32>> image1, Func<Stream> model)
+    public Example3(Surface surface, Func<string, Stream> assetLoader)
     {
         _surface = surface;
 
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
         
-        using (var img = image1())
+        using (var img = GetImage(assetLoader, "Textures/grey.png"))
         {
             m_Texture = _surface.CreateTexture(img);
         }
         
-        m_VertShaderCode = vertexShader();
-        m_fragShaderCode = fragmentShader();
+        m_VertShaderCode = GetVertexShader(assetLoader);
+        m_fragShaderCode = GetFragmentShader(assetLoader);
 
-        using (var file = model())
+        using (var file = assetLoader("Models/deer.gltf"))
         {
             LoadGlTFFile(file);
         }
@@ -389,6 +398,23 @@ public class Example3
         var camera = new Camera(_surface) {FieldOfView = 60};
         _camera.AddComponent(camera);
         cameraRoot.AddChild(_camera);
+    }
+    
+    byte[] GetFragmentShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/frag.spv");
+    byte[] GetVertexShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/vert.spv");
+
+    Image<Rgba32> GetImage(Func<string, Stream> assetLoader, string path)
+    {
+        using var stream = assetLoader(path);
+        return Image.Load<Rgba32>(stream);
+    }
+
+    byte[] GetBytes(Func<string, Stream> assetLoader, string path)
+    {
+        using var stream = assetLoader(path);
+        using var memStream = new MemoryStream();
+        stream.CopyTo(memStream);
+        return memStream.ToArray();
     }
 
 

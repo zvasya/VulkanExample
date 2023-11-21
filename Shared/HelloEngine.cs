@@ -83,9 +83,9 @@ public unsafe partial class HelloEngine : IDisposable
         Helpers.CheckErrors(khrAndroidSurface.CreateAndroidSurface(engine._instance, &createInfo, null, out surface));
     }
 
-    public Surface CreateSurface(Func<SurfaceKHR> factory, bool yInversion = false)
+    public Surface CreateSurface(Func<SurfaceKHR> factory)
     {
-        var surface = Surface.Create(this, factory,yInversion);
+        var surface = Surface.Create(this, factory);
         _surfaces.Add(surface);
         return surface;
     }
