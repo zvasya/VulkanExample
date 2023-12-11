@@ -8,6 +8,7 @@ using Core.PlayerLoopStages;
 using glTFLoader;
 using glTFLoader.Schema;
 using Silk.NET.Maths;
+using Silk.NET.Vulkan;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Camera = Core.Camera;
@@ -23,8 +24,8 @@ public class Example3
     readonly PlayerLoop _playerLoop;
 
     readonly Node _camera;
+    readonly Func<string, Stream> _loader;
 
-    // readonly List<Node> _renderers = new List<Node>();
     readonly List<Node> _roots = new List<Node>();
     
     // struct Vertex {
@@ -176,7 +177,7 @@ public class Example3
                     if (accessor.ComponentType != Accessor.ComponentTypeEnum.FLOAT)
                         throw new Exception("Not supported ComponentType for POSITION buffer");
 
-                    var buffer = file.LoadBinaryBuffer(view.Buffer, ExternalReferenceSolver);
+                    var buffer = file.LoadBinaryBuffer(view.Buffer, GetBytes);
                     vertexCount = accessor.Count;
                     var positionBufferByte = buffer.AsSpan(accessor.ByteOffset + view.ByteOffset, Unsafe.SizeOf<Vector3>() * vertexCount);
                     positionBuffer = MemoryMarshal.Cast<byte, Vector3>(positionBufferByte);
@@ -194,7 +195,7 @@ public class Example3
                     if (accessor.ComponentType != Accessor.ComponentTypeEnum.FLOAT)
                         throw new Exception("Not supported ComponentType for NORMAL buffer");
 
-                    var buffer = file.LoadBinaryBuffer(view.Buffer, ExternalReferenceSolver);
+                    var buffer = file.LoadBinaryBuffer(view.Buffer, GetBytes);
                     var normalsBufferByte = buffer.AsSpan(accessor.ByteOffset + view.ByteOffset, Unsafe.SizeOf<Vector3>() * vertexCount);
                     normalsBuffer = MemoryMarshal.Cast<byte, Vector3>(normalsBufferByte);
                 }
@@ -212,7 +213,7 @@ public class Example3
                     if (accessor.ComponentType != Accessor.ComponentTypeEnum.FLOAT)
                         throw new Exception("Not supported ComponentType for TEXCOORD_0 buffer");
 
-                    var buffer = file.LoadBinaryBuffer(view.Buffer, ExternalReferenceSolver);
+                    var buffer = file.LoadBinaryBuffer(view.Buffer, GetBytes);
                     var normalsBufferByte = buffer.AsSpan(accessor.ByteOffset + view.ByteOffset, Unsafe.SizeOf<Vector2>() * vertexCount);
                     texCoordsBuffer = MemoryMarshal.Cast<byte, Vector2>(normalsBufferByte);
                 }
@@ -238,7 +239,7 @@ public class Example3
                 if (accessor.Type != Accessor.TypeEnum.SCALAR)
                     throw new Exception("Not supported Type for Indices buffer");
 
-                var buffer = file.LoadBinaryBuffer(bufferView.Buffer, ExternalReferenceSolver);
+                var buffer = file.LoadBinaryBuffer(bufferView.Buffer, GetBytes);
                 indexCount += accessor.Count;
 
                 // glTF supports different component types of indices
@@ -272,7 +273,7 @@ public class Example3
                 }
             }
 
-            var pipeline = _surface.CreatePipeLine(m_VertShaderCode, m_fragShaderCode, Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
+            var pipeline = _surface.CreatePipeLine(m_VertShaderCode, m_fragShaderCode, Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions(), GetBindings());
 
             var vb = _surface.CreateVertexBuffer(vertexBuffer.ToArray());
             var ib = _surface.CreateIndexBuffer(indexBuffer.ToArray());
@@ -288,14 +289,31 @@ public class Example3
         }
     }
 
+    static DescriptorSetLayoutBinding[] GetBindings() =>
+    [
+        new DescriptorSetLayoutBinding
+        {
+            Binding = 0,
+            DescriptorCount = 1,
+            DescriptorType = DescriptorType.UniformBuffer,
+            PImmutableSamplers = null,
+            StageFlags = ShaderStageFlags.VertexBit,
+        },
+        
+        new DescriptorSetLayoutBinding
+        {
+            Binding = 1,
+            DescriptorCount = 1,
+            DescriptorType = DescriptorType.CombinedImageSampler,
+            PImmutableSamplers = null,
+            StageFlags = ShaderStageFlags.FragmentBit,
+        }
+    ];
+
     HelloTexture m_Texture;
     byte[] m_VertShaderCode;
     byte[] m_fragShaderCode;
 
-    byte[] ExternalReferenceSolver(string uri)
-    {
-        return Array.Empty<byte>();
-    }
     
     // void LoadImages(Gltf file)
     // {
@@ -361,20 +379,21 @@ public class Example3
 
     public Example3(Surface surface, Func<string, Stream> assetLoader)
     {
+        _loader = assetLoader;
         _surface = surface;
 
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
         
-        using (var img = GetImage(assetLoader, "Textures/grey.png"))
+        using (var img = GetImage("Textures/grey.png"))
         {
             m_Texture = _surface.CreateTexture(img);
         }
         
-        m_VertShaderCode = GetVertexShader(assetLoader);
-        m_fragShaderCode = GetFragmentShader(assetLoader);
+        m_VertShaderCode = GetVertexShader();
+        m_fragShaderCode = GetFragmentShader();
 
-        using (var file = assetLoader("Models/deer.gltf"))
+        using (var file = _loader("Models/deer.gltf"))
         {
             LoadGlTFFile(file);
         }
@@ -400,18 +419,18 @@ public class Example3
         cameraRoot.AddChild(_camera);
     }
     
-    byte[] GetFragmentShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/frag.spv");
-    byte[] GetVertexShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/vert.spv");
+    byte[] GetFragmentShader() => GetBytes("Shaders/frag.spv");
+    byte[] GetVertexShader() => GetBytes("Shaders/vert.spv");
 
-    Image<Rgba32> GetImage(Func<string, Stream> assetLoader, string path)
+    Image<Rgba32> GetImage(string path)
     {
-        using var stream = assetLoader(path);
+        using var stream = _loader(path);
         return Image.Load<Rgba32>(stream);
     }
 
-    byte[] GetBytes(Func<string, Stream> assetLoader, string path)
+    byte[] GetBytes(string path)
     {
-        using var stream = assetLoader(path);
+        using var stream = _loader(path);
         using var memStream = new MemoryStream();
         stream.CopyTo(memStream);
         return memStream.ToArray();

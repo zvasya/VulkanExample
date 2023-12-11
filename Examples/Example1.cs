@@ -4,8 +4,10 @@ using Core;
 using Core.PlayerLoop;
 using Core.PlayerLoopStages;
 using Silk.NET.Maths;
+using Silk.NET.Vulkan;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace Examples;
 
@@ -39,7 +41,7 @@ public class Example1
         _playerLoop = CreatePlayerLoop();
         _surface.BeforeDraw += _playerLoop.Run;
         
-        var pipeline = _surface.CreatePipeLine(GetVertexShader(assetLoader), GetFragmentShader(assetLoader), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions());
+        var pipeline = _surface.CreatePipeLine(GetVertexShader(assetLoader), GetFragmentShader(assetLoader), Vertex.GetBindingDescription(), Vertex.GetAttributeDescriptions(), GetBindings());
         HelloTexture texture;
         using (var img = GetImage(assetLoader, "Textures/texture.jpg"))
         {
@@ -97,6 +99,27 @@ public class Example1
         _renderer5.LocalPosition = new Vector3(0, 0, -1.0f);
         _renderer5.AddComponent(new TwistRotator {Speed = 1.0f/50f});
     }
+
+    static DescriptorSetLayoutBinding[] GetBindings() =>
+    [
+        new DescriptorSetLayoutBinding
+        {
+            Binding = 0,
+            DescriptorCount = 1,
+            DescriptorType = DescriptorType.UniformBuffer,
+            PImmutableSamplers = null,
+            StageFlags = ShaderStageFlags.VertexBit,
+        },
+
+        new DescriptorSetLayoutBinding
+        {
+            Binding = 1,
+            DescriptorCount = 1,
+            DescriptorType = DescriptorType.CombinedImageSampler,
+            PImmutableSamplers = null,
+            StageFlags = ShaderStageFlags.FragmentBit,
+        }
+    ];
 
     byte[] GetFragmentShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/frag.spv");
     byte[] GetVertexShader(Func<string, Stream> assetLoader) => GetBytes(assetLoader, "Shaders/vert.spv");

@@ -28,47 +28,31 @@ public unsafe class HelloDescriptorSetLayout : IDisposable
         }
     }
 
-    public static HelloDescriptorSetLayout Create(LogicalDevice device)
+    public static HelloDescriptorSetLayout Create(LogicalDevice device, DescriptorSetLayoutBinding[] bindings)
     {
-        var descriptorSetLayout = CreateDescriptorSetLayout(device);
+        var descriptorSetLayout = CreateDescriptorSetLayout(device, bindings);
         return new HelloDescriptorSetLayout(device, descriptorSetLayout);
     }
 
-    static DescriptorSetLayout CreateDescriptorSetLayout(LogicalDevice device)
+    static DescriptorSetLayout CreateDescriptorSetLayout(LogicalDevice device, DescriptorSetLayoutBinding[] bindings)
     {
-        DescriptorSetLayoutBinding uboLayoutBinding = new()
+        fixed (DescriptorSetLayoutBinding* bindingsPtr = bindings)
         {
-            Binding = 0,
-            DescriptorCount = 1,
-            DescriptorType = DescriptorType.UniformBuffer,
-            PImmutableSamplers = null,
-            StageFlags = ShaderStageFlags.VertexBit,
-        };
+            DescriptorSetLayoutCreateInfo layoutInfo = new()
+            {
+                SType = StructureType.DescriptorSetLayoutCreateInfo,
+                BindingCount = (uint)bindings.Length,
+                PBindings = bindingsPtr,
+            };
 
-        DescriptorSetLayoutBinding samplerLayoutBinding = new()
-        {
-            Binding = 1,
-            DescriptorCount = 1,
-            DescriptorType = DescriptorType.CombinedImageSampler,
-            PImmutableSamplers = null,
-            StageFlags = ShaderStageFlags.FragmentBit,
-        };
-
-        var bindings = stackalloc DescriptorSetLayoutBinding[] { uboLayoutBinding, samplerLayoutBinding  };
-        DescriptorSetLayoutCreateInfo layoutInfo = new()
-        {
-            SType = StructureType.DescriptorSetLayoutCreateInfo,
-            BindingCount = 2,
-            PBindings = bindings,
-        };
-
-        DescriptorSetLayout descriptorSetLayout;
-        if (device.CreateDescriptorSetLayout(layoutInfo, null, &descriptorSetLayout) != Result.Success)
-        {
-            throw new Exception("failed to create descriptor set layout!");
+            DescriptorSetLayout descriptorSetLayout;
+            if (device.CreateDescriptorSetLayout(layoutInfo, null, &descriptorSetLayout) != Result.Success)
+            {
+                throw new Exception("failed to create descriptor set layout!");
+            }
+            
+            return descriptorSetLayout;
         }
-        
-        return descriptorSetLayout;
     }
 
     public DescriptorSetLayout[] ToArray(int count)

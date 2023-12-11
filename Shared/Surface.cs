@@ -67,9 +67,11 @@ public unsafe partial class Surface : IDisposable
         return texture;
     }
 
-    public HelloPipeline CreatePipeLine(byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions)
+    public HelloPipeline CreatePipeLine(byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions, DescriptorSetLayoutBinding[] bindings)
     {
-        var pipeline = HelloPipeline.Create(_device, vertShaderCode, fragShaderCode, bindingDescription, attributeDescriptions, _renderPass);
+        var descriptorSetLayout = HelloDescriptorSetLayout.Create(_device, bindings);
+        
+        var pipeline = HelloPipeline.Create(_device, vertShaderCode, fragShaderCode, bindingDescription, attributeDescriptions, descriptorSetLayout, _renderPass);
         _graphicsPipelines.Add(pipeline);
         return pipeline;
     }

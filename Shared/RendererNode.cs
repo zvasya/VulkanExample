@@ -12,7 +12,7 @@ public unsafe class RendererNode : IDisposable
     readonly HelloPipeline _pipeline;
     readonly HelloTexture _texture;
 
-    HelloDescriptorSets _descriptorSet;
+    readonly List<HelloDescriptorSets> _descriptorSet = new List<HelloDescriptorSets>();
     UniformBuffer _uniformBuffers;
     readonly HelloIndexBuffer _indexBuffer;
     readonly HelloVertexBuffer _vertexBuffer;
@@ -42,8 +42,9 @@ public unsafe class RendererNode : IDisposable
  
         _vertexBuffer.BindVertexBuffers(commandBuffer);
         _indexBuffer.BindIndexBuffer(commandBuffer);
-        
-        commandBuffer.CmdBindDescriptorSets(PipelineBindPoint.Graphics, _pipeline.PipelineLayout, 0, 1, _descriptorSet[currentImage], 0, null);
+
+        foreach (var set in _descriptorSet) 
+            commandBuffer.CmdBindDescriptorSets(PipelineBindPoint.Graphics, _pipeline.PipelineLayout, 0, 1, set[currentImage], 0, null);
 
         commandBuffer.CmdDrawIndexed(_indexBuffer.IndicesCount, 1, 0, 0, 0);
     }
@@ -58,7 +59,8 @@ public unsafe class RendererNode : IDisposable
     public void CreateUniformBuffers(HelloDescriptorPool descriptorPool)
     {
         _uniformBuffers = UniformBuffer.Create<UniformBufferObject>(_device);
-        _descriptorSet = _uniformBuffers.CreateDescriptorSets(descriptorPool, _pipeline.DescriptorSetLayout, _texture.ImageView, _texture.Sampler);
+        _descriptorSet.Add(_uniformBuffers.CreateDescriptorSets(descriptorPool, _pipeline.DescriptorSetLayout, 0));
+        _descriptorSet.Add(_texture.CreateDescriptorSets(descriptorPool, _pipeline.DescriptorSetLayout, 1));
     }
 
     public void UpdateUniformBuffer(uint currentImage, HelloSwapchain swapChain, CameraNode camera)

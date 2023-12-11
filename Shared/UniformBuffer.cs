@@ -14,8 +14,15 @@ public class UniformBuffer : CircularBuffer
         return new UniformBuffer(device, CreateBuffersArray(device, HelloEngine.MAX_FRAMES_IN_FLIGHT, (ulong)Unsafe.SizeOf<T>(), BufferUsageFlags.UniformBufferBit));
     }
     
-    public HelloDescriptorSets CreateDescriptorSets(HelloDescriptorPool descriptorPool, HelloDescriptorSetLayout descriptorSetLayout, ImageView textureImageView, Sampler textureSampler)
+    public HelloDescriptorSets CreateDescriptorSets(HelloDescriptorPool descriptorPool, HelloDescriptorSetLayout descriptorSetLayout, uint dstBinding)
     {
-        return HelloDescriptorSets.Create(descriptorPool, Device, descriptorSetLayout, Buffers, textureImageView, textureSampler);
+        var descriptors = new DescriptorBufferInfo[Buffers.Length];
+        for (var i = 0; i < Buffers.Length; i++)
+        {
+            var buffer = Buffers[i];
+            descriptors[i] = buffer.BufferInfo();
+        }
+
+        return HelloUniformDescriptorSets.Create(descriptorPool, Device, descriptorSetLayout, Buffers, dstBinding);
     }
 }

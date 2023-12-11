@@ -23,9 +23,8 @@ public unsafe class HelloPipeline : IDisposable
         _graphicsPipeline = graphicsPipeline;
     }
 
-    public static HelloPipeline Create(LogicalDevice device, byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions, HelloRenderPass renderPass)
+    public static HelloPipeline Create(LogicalDevice device, byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions, HelloDescriptorSetLayout descriptorSetLayout, HelloRenderPass renderPass)
     {
-        var descriptorSetLayout = HelloDescriptorSetLayout.Create(device);
         var pipelineLayout = HelloPipelineLayout.Create(device, descriptorSetLayout);
         
         var pipeline = CreatePipeline(device, vertShaderCode, fragShaderCode, bindingDescription, attributeDescriptions, renderPass, pipelineLayout);

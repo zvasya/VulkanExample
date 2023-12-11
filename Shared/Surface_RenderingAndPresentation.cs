@@ -43,16 +43,14 @@ public unsafe partial class Surface
             throw new Exception("failed to acquire swap chain image!");
         }
 
-        foreach (var rendererNode in _renderer)
-        {
-            rendererNode.UpdateUniformBuffer(_currentFrame, _swapChain, _camera);
-        }
+        BeforeRender();
         
         _inFlightFences[_currentFrame].ResetFences();
 
-        _commandBuffers[_currentFrame].ResetCommandBuffer(CommandBufferResetFlags.None);
+        var helloCommandBuffer = _commandBuffers[_currentFrame];
+        helloCommandBuffer.ResetCommandBuffer(CommandBufferResetFlags.None);
         
-        RecordCommandBuffer(_commandBuffers[_currentFrame], _currentFrame, imageIndex);
+        RecordCommandBuffer(helloCommandBuffer, _currentFrame, imageIndex);
 
         // Submitting the command buffer
         var imageAvailableSemaphore = _imageAvailableSemaphores[_currentFrame].Semaphore;
@@ -60,7 +58,7 @@ public unsafe partial class Surface
         var waitStages = stackalloc PipelineStageFlags[] { PipelineStageFlags.ColorAttachmentOutputBit };
         var renderFinishedSemaphore = _renderFinishedSemaphores[_currentFrame].Semaphore;
         var signalSemaphores = stackalloc Semaphore[] { renderFinishedSemaphore };
-        var commandBuffer = _commandBuffers[_currentFrame].CommandBuffer;
+        var commandBuffer = helloCommandBuffer.CommandBuffer;
         var commandBuffersPtr = stackalloc CommandBuffer[] { commandBuffer };
 
         var submitInfo = new SubmitInfo
@@ -109,7 +107,15 @@ public unsafe partial class Surface
         _currentFrame = (_currentFrame + 1) % HelloEngine.MAX_FRAMES_IN_FLIGHT;
         Helpers.CheckErrors(_device.PresentQueue.QueueWaitIdle());
     }
-    
+
+    void BeforeRender()
+    {
+        foreach (var rendererNode in _renderer)
+        {
+            rendererNode.UpdateUniformBuffer(_currentFrame, _swapChain, _camera);
+        }
+    }
+
     void RecordCommandBuffer(HelloCommandBuffer commandBuffer, uint currentFrame, uint imageIndex) {
         var beginInfo = new CommandBufferBeginInfo
         {

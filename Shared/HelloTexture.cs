@@ -82,6 +82,11 @@ public unsafe class HelloTexture : IDisposable
 
         return textureSampler;
     }
+    
+    public HelloDescriptorSets CreateDescriptorSets(HelloDescriptorPool descriptorPool, HelloDescriptorSetLayout descriptorSetLayout, uint dstBinding)
+    {
+        return HelloTextureDescriptorSet.Create(descriptorPool, _device, descriptorSetLayout, this, HelloEngine.MAX_FRAMES_IN_FLIGHT, dstBinding);
+    }
 
     public void Dispose()
     {
