@@ -67,6 +67,13 @@ public unsafe partial class Surface : IDisposable
         return texture;
     }
 
+    public UniformBuffer CreateUniformBuffer<T>() where T: struct
+    {
+        var uniformBuffer = UniformBuffer.Create<T>(_device);
+        _circularBuffers.Add(uniformBuffer);
+        return uniformBuffer;
+    }
+
     public HelloPipeline CreatePipeLine(byte[] vertShaderCode, byte[] fragShaderCode, VertexInputBindingDescription bindingDescription, VertexInputAttributeDescription[] attributeDescriptions, DescriptorSetLayoutBinding[] bindings)
     {
         var descriptorSetLayout = HelloDescriptorSetLayout.Create(_device, bindings);
@@ -99,13 +106,10 @@ public unsafe partial class Surface : IDisposable
     {
         _camera = camera;
     }
-
-    public RendererNode CreateRenderer(HelloPipeline pipeline, HelloVertexBuffer vertexBuffer, HelloIndexBuffer indexBuffer, HelloTexture texture)
+    
+    public void RegisterRenderer(IRendererNode renderer)
     {
-        var node = RendererNode.Create(_device, pipeline, vertexBuffer, indexBuffer, texture);
-        _renderer.Add(node);
-        node.CreateUniformBuffers(_descriptorPool);
-        return node;
+        _rendererNodes.Add(renderer);
     }
 
     HelloPhysicalDevice PickPhysicalDevice()
@@ -122,18 +126,19 @@ public unsafe partial class Surface : IDisposable
 
         _renderPass.Dispose();
 
-        foreach (var rendererNode in _renderer)
-            rendererNode.ResetUniformBuffers();
+        foreach (var circularBuffer in _circularBuffers)
+            circularBuffer.Dispose();
+        _circularBuffers.Clear();
 
         _descriptorPool.Dispose();
 
         foreach (var texture in _textures) 
             texture.Dispose();
+        _textures.Clear();
 
-        foreach (var rendererNode in _renderer)
-        {
-            rendererNode.Dispose();
-        }
+        foreach (var buffer in _buffers) 
+            buffer.Dispose();
+        _buffers.Clear();
         
         for (var i = 0; i < _renderFinishedSemaphores.Length; i++)
         {
@@ -146,6 +151,5 @@ public unsafe partial class Surface : IDisposable
 
         _engine.DestroySurface(_surface, null);
     }
-    
     
 }

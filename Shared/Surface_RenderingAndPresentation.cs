@@ -110,9 +110,9 @@ public unsafe partial class Surface
 
     void BeforeRender()
     {
-        foreach (var rendererNode in _renderer)
+        foreach (var rendererNode in _rendererNodes)
         {
-            rendererNode.UpdateUniformBuffer(_currentFrame, _swapChain, _camera);
+            rendererNode.BeforeDraw(_camera, _currentFrame);
         }
     }
 
@@ -176,7 +176,7 @@ public unsafe partial class Surface
         commandBuffer.CmdSetViewport(0, 1, &viewport);
         commandBuffer.CmdSetScissor(0, 1, &scissor);
         
-        foreach (var rendererNode in _renderer) 
+        foreach (var rendererNode in _rendererNodes) 
             rendererNode.Draw(commandBuffer, currentFrame);
         
         commandBuffer.CmdEndRenderPass();

@@ -3,6 +3,8 @@
 public partial class Surface
 {
     HelloDescriptorPool _descriptorPool;
+
+    public HelloDescriptorPool DescriptorPool => _descriptorPool;
     
     void CreateDescriptorPool()
     {

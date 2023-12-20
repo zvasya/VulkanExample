@@ -63,7 +63,6 @@ public unsafe class HelloPipeline : IDisposable
             Stage = ShaderStageFlags.VertexBit,
             Module = vertShaderModule,
             PName = (byte*)Marshal.StringToHGlobalAnsi("main"),
-                
         };
 
         var fragShaderStageInfo = new PipelineShaderStageCreateInfo
