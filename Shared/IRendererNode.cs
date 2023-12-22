@@ -1,7 +1,7 @@
 namespace Shared;
 
-public  interface IRendererNode
+public interface IRenderer
 {
-    void Draw(HelloCommandBuffer commandBuffer, uint currentImage);
-    void BeforeDraw(CameraNode cameraNode, uint currentImage);
+    void Draw(HelloCommandBuffer commandBuffer);
+    void BeforeDraw();
 }

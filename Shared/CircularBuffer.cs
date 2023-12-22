@@ -8,6 +8,7 @@ public class CircularBuffer : IDisposable
 
     protected readonly HelloBuffer[] Buffers;
 
+    protected int _current;
     protected CircularBuffer(LogicalDevice device, HelloBuffer[] buffers)
     {
         Device = device;
@@ -17,6 +18,13 @@ public class CircularBuffer : IDisposable
     public HelloBuffer this[uint index]
     {
         get { return Buffers[index]; }
+    }
+
+    public HelloBuffer Current => Buffers[_current];
+
+    public void MoveNext()
+    {
+        _current = (_current + 1) % Buffers.Length;
     }
 
     public static CircularBuffer Create(LogicalDevice device, int count, ulong bufferSize, BufferUsageFlags bufferUsageFlags)

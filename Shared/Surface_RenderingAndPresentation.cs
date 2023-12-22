@@ -42,15 +42,13 @@ public unsafe partial class Surface
         {
             throw new Exception("failed to acquire swap chain image!");
         }
-
-        BeforeRender();
         
         _inFlightFences[_currentFrame].ResetFences();
 
         var helloCommandBuffer = _commandBuffers[_currentFrame];
         helloCommandBuffer.ResetCommandBuffer(CommandBufferResetFlags.None);
         
-        RecordCommandBuffer(helloCommandBuffer, _currentFrame, imageIndex);
+        RecordCommandBuffer(helloCommandBuffer, _swapChainFramebuffers[imageIndex]);
 
         // Submitting the command buffer
         var imageAvailableSemaphore = _imageAvailableSemaphores[_currentFrame].Semaphore;
@@ -104,19 +102,13 @@ public unsafe partial class Surface
             throw new Exception("failed to present swap chain image!");
         }
 
-        _currentFrame = (_currentFrame + 1) % HelloEngine.MAX_FRAMES_IN_FLIGHT;
+        helloCommandBuffer.currentImage = 
+            _currentFrame = (_currentFrame + 1) % HelloEngine.MAX_FRAMES_IN_FLIGHT;
         Helpers.CheckErrors(_device.PresentQueue.QueueWaitIdle());
     }
 
-    void BeforeRender()
-    {
-        foreach (var rendererNode in _rendererNodes)
-        {
-            rendererNode.BeforeDraw(_camera, _currentFrame);
-        }
-    }
 
-    void RecordCommandBuffer(HelloCommandBuffer commandBuffer, uint currentFrame, uint imageIndex) {
+    void RecordCommandBuffer(HelloCommandBuffer commandBuffer, HelloFrameBuffer swapChainFramebuffer) {
         var beginInfo = new CommandBufferBeginInfo
         {
             SType = StructureType.CommandBufferBeginInfo,
@@ -124,7 +116,7 @@ public unsafe partial class Surface
             PInheritanceInfo = null, // Optional
         };
         Helpers.CheckErrors(commandBuffer.BeginCommandBuffer(&beginInfo));
-
+        
         // Pass
 
         var viewport =
@@ -144,8 +136,8 @@ public unsafe partial class Surface
             Extent = _swapChain.Extent,
         };
 
-
-        ClearAttachments(commandBuffer, _swapChainFramebuffers[imageIndex], scissor);
+        
+        ClearAttachments(commandBuffer, swapChainFramebuffer, scissor);
         
         var clearColorValue = new ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f);
         var depthColorValue = new ClearDepthStencilValue(1.0f, 0);
@@ -164,7 +156,7 @@ public unsafe partial class Surface
         {
             SType = StructureType.RenderPassBeginInfo,
             RenderPass = _renderPass.RenderPass,
-            Framebuffer = _swapChainFramebuffers[imageIndex].Framebuffer,
+            Framebuffer = swapChainFramebuffer.Framebuffer,
             RenderArea = new Rect2D(extent: new Extent2D(_swapChain.Extent.Width,_swapChain.Extent.Height)),
             ClearValueCount = 0,
             PClearValues = clearValues,
@@ -176,8 +168,9 @@ public unsafe partial class Surface
         commandBuffer.CmdSetViewport(0, 1, &viewport);
         commandBuffer.CmdSetScissor(0, 1, &scissor);
         
-        foreach (var rendererNode in _rendererNodes) 
-            rendererNode.Draw(commandBuffer, currentFrame);
+        //TODO
+        // foreach (var rendererNode in _rendererNodes) 
+        //     rendererNode.Draw(commandBuffer, currentFrame);
         
         commandBuffer.CmdEndRenderPass();
         Helpers.CheckErrors(commandBuffer.EndCommandBuffer());

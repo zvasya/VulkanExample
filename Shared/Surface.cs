@@ -107,9 +107,9 @@ public unsafe partial class Surface : IDisposable
         _camera = camera;
     }
     
-    public void RegisterRenderer(IRendererNode renderer)
+    public void RegisterRenderer(IRenderer renderer)
     {
-        _rendererNodes.Add(renderer);
+        _renderer = renderer;
     }
 
     HelloPhysicalDevice PickPhysicalDevice()

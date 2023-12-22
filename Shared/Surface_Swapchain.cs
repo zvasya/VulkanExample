@@ -7,7 +7,7 @@ public unsafe partial class Surface
     HelloSwapchain _swapChain;
     readonly List<HelloTexture> _textures = new List<HelloTexture>();
     readonly List<HelloBuffer> _buffers = new List<HelloBuffer>();
-    readonly List<IRendererNode> _rendererNodes = new List<IRendererNode>();
+    IRenderer? _renderer;
     readonly List<CircularBuffer> _circularBuffers = new List<CircularBuffer>();
     CameraNode _camera;
 
