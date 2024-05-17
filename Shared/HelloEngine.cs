@@ -28,6 +28,7 @@ public unsafe partial class HelloEngine : IDisposable
     DebugUtils? _debug;
 
     readonly Instance _instance;
+    public Instance Instance => _instance;
 
     HelloEngine(IPlatform platform, Instance instance)
     {

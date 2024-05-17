@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples", "Examples\Exampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iosSDL", "iosSDL\iosSDL.csproj", "{33D1698F-3732-44DD-A5B9-A9CBD0B019F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDB902C3-75D2-4ABB-8779-B8C0EA85CBAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33D1698F-3732-44DD-A5B9-A9CBD0B019F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33D1698F-3732-44DD-A5B9-A9CBD0B019F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33D1698F-3732-44DD-A5B9-A9CBD0B019F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33D1698F-3732-44DD-A5B9-A9CBD0B019F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
